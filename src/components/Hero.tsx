@@ -13,7 +13,7 @@ type HeroProps = {
 
 const Hero = ({ searchQuery, onSearchChange, couponCount, searchAllOptions, onSearchAllOptionsChange }: HeroProps) => {
   return (
-    <section className="relative overflow-hidden bg-gradient-hero py-8 md:py-12">
+    <section className="relative overflow-hidden bg-gradient-hero py-4 md:py-6">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
