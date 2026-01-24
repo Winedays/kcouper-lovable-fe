@@ -3,7 +3,6 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ItemFilter, { type ItemFilterId, filterMatchRules } from "@/components/ItemFilter";
 import CouponGrid from "@/components/CouponGrid";
-import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import SortSelect, { type SortOption } from "@/components/SortSelect";
 import { coupons } from "@/data/coupons";
@@ -162,7 +161,7 @@ const Index = () => {
         </section>
       </main>
 
-      <Footer />
+      
       <ScrollToTop />
     </div>
   );
