@@ -75,7 +75,7 @@ const SearchPanel = ({
               htmlFor="search-all-options-panel"
               className="cursor-pointer text-xs text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
             >
-              搜尋所有可替換的餐點選項
+              搜尋所有選項
             </Label>
           </div>
 
