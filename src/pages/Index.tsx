@@ -16,7 +16,7 @@ const Index = () => {
   const [sortBy, setSortBy] = useState<SortOption>("price-asc");
   const [searchAllOptions, setSearchAllOptions] = useState(false);
   
-  const { coupons, count: couponCount, isLoading, error } = useCoupons();
+  const { coupons, count: couponCount, lastUpdate, isLoading, error } = useCoupons();
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
 
   const handleFilterToggle = useCallback((filter: ItemFilterId) => {
@@ -141,7 +141,7 @@ const Index = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
+      <Header lastUpdate={lastUpdate} />
       
       <main className="flex-1">
         <Hero couponCount={couponCount} />
