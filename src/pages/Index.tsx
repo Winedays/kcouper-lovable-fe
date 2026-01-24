@@ -5,6 +5,7 @@ import ItemFilter, { type ItemFilterId } from "@/components/ItemFilter";
 import CouponGrid from "@/components/CouponGrid";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
+import SortSelect, { type SortOption } from "@/components/SortSelect";
 import { coupons } from "@/data/coupons";
 import { useFavorites } from "@/hooks/useFavorites";
 
@@ -12,6 +13,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<ItemFilterId[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>("code");
   
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
 
@@ -44,8 +46,8 @@ const Index = () => {
     return item.includes(filter);
   };
 
-  const filteredCoupons = useMemo(() => {
-    return coupons.filter((coupon) => {
+  const filteredAndSortedCoupons = useMemo(() => {
+    const filtered = coupons.filter((coupon) => {
       // Favorites filter
       if (showFavoritesOnly && !favorites.includes(coupon.id)) {
         return false;
@@ -68,7 +70,25 @@ const Index = () => {
 
       return matchesFilter && matchesSearch;
     });
-  }, [searchQuery, activeFilters, showFavoritesOnly, favorites]);
+
+    // Sort the filtered coupons
+    return [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "code":
+          return (a.code || "").localeCompare(b.code || "");
+        case "price-asc":
+          return a.couponPrice - b.couponPrice;
+        case "price-desc":
+          return b.couponPrice - a.couponPrice;
+        case "discount":
+          return b.discount - a.discount; // Higher discount first
+        case "expiry":
+          return new Date(a.validUntil).getTime() - new Date(b.validUntil).getTime();
+        default:
+          return 0;
+      }
+    });
+  }, [searchQuery, activeFilters, showFavoritesOnly, favorites, sortBy]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -97,20 +117,21 @@ const Index = () => {
             />
           </div>
 
-          {/* Results info */}
-          <div className="mb-6 flex items-center justify-between">
+          {/* Results info with sort */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
               共找到{" "}
               <span className="font-semibold text-foreground">
-                {filteredCoupons.length}
+                {filteredAndSortedCoupons.length}
               </span>{" "}
               張優惠券
             </p>
+            <SortSelect value={sortBy} onChange={setSortBy} />
           </div>
 
           {/* Coupon grid */}
           <CouponGrid
-            coupons={filteredCoupons}
+            coupons={filteredAndSortedCoupons}
             isFavorite={isFavorite}
             onToggleFavorite={toggleFavorite}
           />
