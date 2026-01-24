@@ -94,12 +94,9 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
 
           {/* Price section */}
           <div className="mb-4 flex items-end justify-between border-t border-border/50 pt-4">
-            <div>
-              <p className="text-xs text-muted-foreground">優惠價</p>
-              <p className="text-2xl font-black text-gradient">
-                ${coupon.price}
-              </p>
-            </div>
+            <p className="text-2xl font-black text-gradient">
+              ${coupon.price}
+            </p>
             <div className="text-right">
               <p className="text-sm text-muted-foreground line-through">
                 原價 ${coupon.original_price}
