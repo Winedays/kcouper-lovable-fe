@@ -6,10 +6,14 @@ import CouponGrid from "@/components/CouponGrid";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import { coupons } from "@/data/coupons";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<ItemFilterId[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  
+  const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
 
   const handleFilterToggle = useCallback((filter: ItemFilterId) => {
     setActiveFilters((prev) =>
@@ -21,6 +25,11 @@ const Index = () => {
 
   const handleClearFilters = useCallback(() => {
     setActiveFilters([]);
+    setShowFavoritesOnly(false);
+  }, []);
+
+  const handleToggleFavorites = useCallback(() => {
+    setShowFavoritesOnly((prev) => !prev);
   }, []);
 
   const checkItemMatchesFilter = (item: string, filter: ItemFilterId): boolean => {
@@ -37,6 +46,11 @@ const Index = () => {
 
   const filteredCoupons = useMemo(() => {
     return coupons.filter((coupon) => {
+      // Favorites filter
+      if (showFavoritesOnly && !favorites.includes(coupon.id)) {
+        return false;
+      }
+
       // If no filters selected, show all
       const matchesFilter =
         activeFilters.length === 0 ||
@@ -54,7 +68,7 @@ const Index = () => {
 
       return matchesFilter && matchesSearch;
     });
-  }, [searchQuery, activeFilters]);
+  }, [searchQuery, activeFilters, showFavoritesOnly, favorites]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -77,6 +91,9 @@ const Index = () => {
               activeFilters={activeFilters}
               onFilterToggle={handleFilterToggle}
               onClearAll={handleClearFilters}
+              showFavoritesOnly={showFavoritesOnly}
+              onToggleFavorites={handleToggleFavorites}
+              favoritesCount={favoritesCount}
             />
           </div>
 
@@ -92,7 +109,11 @@ const Index = () => {
           </div>
 
           {/* Coupon grid */}
-          <CouponGrid coupons={filteredCoupons} />
+          <CouponGrid
+            coupons={filteredCoupons}
+            isFavorite={isFavorite}
+            onToggleFavorite={toggleFavorite}
+          />
         </section>
       </main>
 

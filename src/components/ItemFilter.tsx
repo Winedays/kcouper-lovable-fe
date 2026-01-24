@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
+import { X, Heart } from "lucide-react";
 
 export const itemFilters = [
   { id: "炸雞", label: "炸雞", emoji: "🍗" },
@@ -16,13 +16,51 @@ type ItemFilterProps = {
   activeFilters: ItemFilterId[];
   onFilterToggle: (filter: ItemFilterId) => void;
   onClearAll: () => void;
+  showFavoritesOnly: boolean;
+  onToggleFavorites: () => void;
+  favoritesCount: number;
 };
 
-const ItemFilter = ({ activeFilters, onFilterToggle, onClearAll }: ItemFilterProps) => {
-  const hasActiveFilters = activeFilters.length > 0;
+const ItemFilter = ({
+  activeFilters,
+  onFilterToggle,
+  onClearAll,
+  showFavoritesOnly,
+  onToggleFavorites,
+  favoritesCount,
+}: ItemFilterProps) => {
+  const hasActiveFilters = activeFilters.length > 0 || showFavoritesOnly;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
+      {/* Favorites filter */}
+      <button
+        onClick={onToggleFavorites}
+        className={cn(
+          "inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+          showFavoritesOnly
+            ? "bg-primary text-primary-foreground shadow-md scale-105"
+            : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+        )}
+      >
+        <Heart className={cn("h-4 w-4", showFavoritesOnly && "fill-current")} />
+        <span>收藏</span>
+        {favoritesCount > 0 && (
+          <span className={cn(
+            "ml-1 rounded-full px-1.5 py-0.5 text-xs font-bold",
+            showFavoritesOnly
+              ? "bg-primary-foreground/20 text-primary-foreground"
+              : "bg-primary/10 text-primary"
+          )}>
+            {favoritesCount}
+          </span>
+        )}
+      </button>
+
+      {/* Divider */}
+      <div className="h-6 w-px bg-border" />
+
+      {/* Item filters */}
       {itemFilters.map((filter) => {
         const isActive = activeFilters.includes(filter.id);
         return (

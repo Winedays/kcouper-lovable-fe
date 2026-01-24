@@ -1,15 +1,14 @@
 import { type Coupon } from "@/data/coupons";
 import CouponCard from "./CouponCard";
 import { PackageOpen } from "lucide-react";
-import { useFavorites } from "@/hooks/useFavorites";
 
 type CouponGridProps = {
   coupons: Coupon[];
+  isFavorite: (id: string) => boolean;
+  onToggleFavorite: (id: string) => void;
 };
 
-const CouponGrid = ({ coupons }: CouponGridProps) => {
-  const { isFavorite, toggleFavorite } = useFavorites();
-
+const CouponGrid = ({ coupons, isFavorite, onToggleFavorite }: CouponGridProps) => {
   if (coupons.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -30,7 +29,7 @@ const CouponGrid = ({ coupons }: CouponGridProps) => {
           coupon={coupon}
           index={index}
           isFavorite={isFavorite(coupon.id)}
-          onToggleFavorite={toggleFavorite}
+          onToggleFavorite={onToggleFavorite}
         />
       ))}
     </div>
