@@ -36,7 +36,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
             <span className="hidden sm:inline">更新日誌</span>
           </a>
           <a
-            href="mailto:contact@kcouper.com"
+            href="mailto:adlerau.work@gmail.com"
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             title="聯絡我們"
           >
@@ -44,7 +44,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
             <span className="hidden sm:inline">聯絡我們</span>
           </a>
           <a
-            href="https://github.com"
+            href="https://github.com/Winedays/KCouper"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
