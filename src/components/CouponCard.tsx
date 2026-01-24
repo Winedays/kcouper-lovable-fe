@@ -171,6 +171,25 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
             </DialogDescription>
           </DialogHeader>
 
+          {/* Order button at top */}
+          <div className="mt-4">
+            <Button
+              variant="hero"
+              className="w-full"
+              asChild
+            >
+              <a
+                href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2"
+              >
+                <span>前往點餐</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+
           <div className="mt-4 space-y-4">
             {/* Price reminder */}
             <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
@@ -224,25 +243,6 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Order button in dialog */}
-          <div className="mt-6">
-            <Button
-              variant="hero"
-              className="w-full"
-              asChild
-            >
-              <a
-                href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2"
-              >
-                <span>前往點餐</span>
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
