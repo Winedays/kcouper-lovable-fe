@@ -6,7 +6,7 @@ import { type ItemFilterId, filterMatchRules } from "@/components/ItemFilter";
 import CouponGrid from "@/components/CouponGrid";
 import ScrollToTop from "@/components/ScrollToTop";
 import { type SortOption } from "@/components/SortSelect";
-import { coupons } from "@/data/coupons";
+import { useCoupons } from "@/hooks/useCoupons";
 import { useFavorites } from "@/hooks/useFavorites";
 
 const Index = () => {
@@ -16,6 +16,7 @@ const Index = () => {
   const [sortBy, setSortBy] = useState<SortOption>("price-asc");
   const [searchAllOptions, setSearchAllOptions] = useState(false);
   
+  const { coupons, count: couponCount, isLoading, error } = useCoupons();
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
 
   const handleFilterToggle = useCallback((filter: ItemFilterId) => {
@@ -104,14 +105,44 @@ const Index = () => {
           return 0;
       }
     });
-  }, [searchQuery, activeFilters, showFavoritesOnly, favorites, sortBy, searchAllOptions]);
+  }, [coupons, searchQuery, activeFilters, showFavoritesOnly, favorites, sortBy, searchAllOptions]);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">載入優惠券資料中...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="text-center text-destructive">
+            <p>載入優惠券資料失敗</p>
+            <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
       
       <main className="flex-1">
-        <Hero couponCount={coupons.length} />
+        <Hero couponCount={couponCount} />
 
         <SearchPanel
           searchQuery={searchQuery}
