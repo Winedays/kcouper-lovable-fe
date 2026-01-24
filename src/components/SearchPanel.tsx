@@ -40,7 +40,7 @@ const SearchPanel = ({
   const hasActiveFilters = activeFilters.length > 0 || showFavoritesOnly;
 
   return (
-    <div className="sticky top-16 z-40 border-b border-border/50 bg-background/95 backdrop-blur-sm">
+    <div className="border-b border-border/50 bg-background">
       <div className="container py-4">
         {/* Search row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
