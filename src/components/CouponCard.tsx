@@ -101,11 +101,8 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-muted-foreground line-through">
+              <p className="text-sm text-muted-foreground line-through">
                 原價 ${coupon.original_price}
-              </p>
-              <p className="text-sm font-semibold text-primary">
-                現省 ${savings}
               </p>
             </div>
           </div>
