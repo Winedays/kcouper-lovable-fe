@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import ItemFilter, { type ItemFilterId } from "@/components/ItemFilter";
+import ItemFilter, { type ItemFilterId, filterMatchRules } from "@/components/ItemFilter";
 import CouponGrid from "@/components/CouponGrid";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -35,24 +35,16 @@ const Index = () => {
     setShowFavoritesOnly((prev) => !prev);
   }, []);
 
+  /**
+   * Check if an item name matches a filter using the filterMatchRules
+   * @param itemName - The name of the item to check
+   * @param filter - The filter ID to match against
+   * @returns True if the item matches any of the filter's match rules
+   */
   const checkItemMatchesFilter = (itemName: string, filter: ItemFilterId): boolean => {
-    // Special case for drinks - match 可樂, 雪碧, 紅茶, etc.
-    if (filter === "飲料") {
-      return itemName.includes("可樂") || itemName.includes("雪碧") || itemName.includes("紅茶") || itemName.includes("綠茶") || itemName.includes("奶茶") || itemName.includes("咖啡");
-    }
-    // Special case for burgers - match 堡
-    if (filter === "漢堡") {
-      return itemName.includes("堡");
-    }
-    // Special case for chicken
-    if (filter === "炸雞") {
-      return itemName.includes("雞") && !itemName.includes("雞塊") && !itemName.includes("雞腿堡");
-    }
-    // Special case for fries
-    if (filter === "薯條") {
-      return itemName.includes("薯");
-    }
-    return itemName.includes(filter);
+    const matchPatterns = filterMatchRules[filter];
+    if (!matchPatterns) return false;
+    return matchPatterns.some((pattern) => itemName.includes(pattern));
   };
 
   const filteredAndSortedCoupons = useMemo(() => {
