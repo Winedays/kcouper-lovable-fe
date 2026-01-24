@@ -123,9 +123,9 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               )}
               <span>{coupon.coupon_code}</span>
             </button>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
-              <span>至 {coupon.end_date}</span>
+              <span>{coupon.start_date} ~ {coupon.end_date}</span>
             </div>
           </div>
 
