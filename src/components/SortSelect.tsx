@@ -42,7 +42,7 @@ const SortSelect = ({ value, onChange }: SortSelectProps) => {
         </SelectTrigger>
         <SelectContent className="bg-background z-50">
           {sortOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem key={option.value} value={option.value} className="pl-3 [&>span:first-child]:hidden">
               {option.label}
             </SelectItem>
           ))}
