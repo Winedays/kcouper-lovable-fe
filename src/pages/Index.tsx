@@ -41,10 +41,16 @@ const Index = () => {
    * @param filter - The filter ID to match against
    * @returns True if the item matches any of the filter's match rules
    */
-  const checkItemMatchesFilter = (itemName: string, filter: ItemFilterId): boolean => {
+  /**
+   * Check if a name matches a filter using the filterMatchRules
+   * @param name - The name to check (item name or flavor name)
+   * @param filter - The filter ID to match against
+   * @returns True if the name matches any of the filter's match rules
+   */
+  const checkNameMatchesFilter = (name: string, filter: ItemFilterId): boolean => {
     const matchPatterns = filterMatchRules[filter];
     if (!matchPatterns) return false;
-    return matchPatterns.some((pattern) => itemName.includes(pattern));
+    return matchPatterns.some((pattern) => name.includes(pattern));
   };
 
   const filteredAndSortedCoupons = useMemo(() => {
@@ -55,10 +61,14 @@ const Index = () => {
       }
 
       // If no filters selected, show all
+      // When searchAllOptions is enabled, also check flavors for filter matches
       const matchesFilter =
         activeFilters.length === 0 ||
         activeFilters.every((filter) =>
-          coupon.items.some((item) => checkItemMatchesFilter(item.name, filter))
+          coupon.items.some((item) => 
+            checkNameMatchesFilter(item.name, filter) ||
+            (searchAllOptions && item.flavors?.some((flavor) => checkNameMatchesFilter(flavor.name, filter)))
+          )
         );
 
       // Search filter
