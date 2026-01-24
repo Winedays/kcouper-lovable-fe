@@ -1,13 +1,17 @@
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
+import { Checkbox } from "./ui/checkbox";
+import { Label } from "./ui/label";
 
 type HeroProps = {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   couponCount: number;
+  searchAllOptions: boolean;
+  onSearchAllOptionsChange: (value: boolean) => void;
 };
 
-const Hero = ({ searchQuery, onSearchChange, couponCount }: HeroProps) => {
+const Hero = ({ searchQuery, onSearchChange, couponCount, searchAllOptions, onSearchAllOptionsChange }: HeroProps) => {
   return (
     <section className="relative overflow-hidden bg-gradient-hero py-16 md:py-24">
       {/* Background decoration */}
@@ -40,6 +44,21 @@ const Hero = ({ searchQuery, onSearchChange, couponCount }: HeroProps) => {
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="h-12 rounded-xl border-border/60 bg-card pl-12 pr-4 text-base shadow-card transition-shadow duration-200 placeholder:text-muted-foreground/60 focus:shadow-card-hover"
               />
+            </div>
+            
+            {/* Search all options toggle */}
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <Checkbox
+                id="search-all-options"
+                checked={searchAllOptions}
+                onCheckedChange={(checked) => onSearchAllOptionsChange(checked === true)}
+              />
+              <Label
+                htmlFor="search-all-options"
+                className="cursor-pointer text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                搜尋所有可替換的餐點選項
+              </Label>
             </div>
           </div>
         </div>

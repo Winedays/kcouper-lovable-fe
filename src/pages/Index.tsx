@@ -14,6 +14,7 @@ const Index = () => {
   const [activeFilters, setActiveFilters] = useState<ItemFilterId[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("code-asc");
+  const [searchAllOptions, setSearchAllOptions] = useState(false);
   
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
 
@@ -75,7 +76,11 @@ const Index = () => {
         coupon.name.toLowerCase().includes(searchLower) ||
         coupon.items.some((item) => item.name.toLowerCase().includes(searchLower)) ||
         coupon.coupon_code.toString().includes(searchLower) ||
-        coupon.product_code.toLowerCase().includes(searchLower);
+        coupon.product_code.toLowerCase().includes(searchLower) ||
+        // Search in flavors when searchAllOptions is enabled
+        (searchAllOptions && coupon.items.some((item) => 
+          item.flavors?.some((flavor) => flavor.name.toLowerCase().includes(searchLower))
+        ));
 
       return matchesFilter && matchesSearch;
     });
@@ -103,7 +108,7 @@ const Index = () => {
           return 0;
       }
     });
-  }, [searchQuery, activeFilters, showFavoritesOnly, favorites, sortBy]);
+  }, [searchQuery, activeFilters, showFavoritesOnly, favorites, sortBy, searchAllOptions]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -114,6 +119,8 @@ const Index = () => {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           couponCount={coupons.length}
+          searchAllOptions={searchAllOptions}
+          onSearchAllOptionsChange={setSearchAllOptions}
         />
 
         <section className="container py-8 md:py-12">
