@@ -2,7 +2,7 @@ import { type Coupon } from "@/data/coupons";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Copy, Check, Calendar, ExternalLink, ChefHat, ArrowRightLeft } from "lucide-react";
+import { Copy, Check, Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -16,11 +16,18 @@ import {
 type CouponCardProps = {
   coupon: Coupon;
   index: number;
+  isFavorite: boolean;
+  onToggleFavorite: (id: string) => void;
 };
 
-const CouponCard = ({ coupon, index }: CouponCardProps) => {
+const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardProps) => {
   const [copied, setCopied] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleToggleFavorite = () => {
+    onToggleFavorite(coupon.id);
+    toast.success(isFavorite ? "已取消收藏" : "已加入收藏");
+  };
 
   const handleCopyCode = () => {
     if (coupon.code) {
@@ -45,6 +52,19 @@ const CouponCard = ({ coupon, index }: CouponCardProps) => {
           animationDelay: `${index * 50}ms`,
         }}
       >
+        {/* Favorite button */}
+        <button
+          onClick={handleToggleFavorite}
+          className="absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-all hover:scale-110"
+          aria-label={isFavorite ? "取消收藏" : "加入收藏"}
+        >
+          <Heart
+            className={`h-4 w-4 transition-colors ${
+              isFavorite ? "fill-primary text-primary" : "text-muted-foreground"
+            }`}
+          />
+        </button>
+
         {/* Discount badge */}
         <div className="absolute -right-8 top-4 rotate-45">
           <div className="bg-gradient-primary px-10 py-1 text-xs font-bold text-primary-foreground shadow-md">
