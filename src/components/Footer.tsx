@@ -5,12 +5,6 @@ const Footer = () => {
     <footer className="sticky bottom-0 z-50 w-full border-t border-border/50 bg-background">
       <div className="container py-8">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-primary">
-              <span className="text-sm font-black text-primary-foreground">K</span>
-            </div>
-            <span className="text-sm font-semibold text-foreground">KCouper</span>
-          </div>
 
           <p className="text-center text-sm text-muted-foreground">
             本網站僅提供優惠資訊整理，非 KFC 官方網站
