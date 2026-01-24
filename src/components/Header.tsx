@@ -1,3 +1,4 @@
+import { Github, Mail } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
@@ -13,7 +14,29 @@ const Header = () => {
           </span>
         </div>
 
+        <p className="hidden text-center text-sm text-muted-foreground md:block">
+          本網站僅提供優惠資訊整理，非 KFC 官方網站
+        </p>
+
         <nav className="flex items-center gap-2">
+          <a
+            href="mailto:contact@kcouper.com"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            title="聯絡我們"
+          >
+            <Mail className="h-4 w-4" />
+            <span className="hidden sm:inline">聯絡我們</span>
+          </a>
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            title="GitHub"
+          >
+            <Github className="h-4 w-4" />
+            <span className="hidden sm:inline">GitHub</span>
+          </a>
           <ThemeToggle />
         </nav>
       </div>
