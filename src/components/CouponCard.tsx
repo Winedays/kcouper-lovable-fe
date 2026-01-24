@@ -73,11 +73,6 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
         </div>
 
         <div className="p-5">
-          {/* Category badge */}
-          <Badge variant="secondary" className="mb-3 text-xs font-medium">
-            {coupon.category}
-          </Badge>
-
           {/* Title */}
           <h3 className="mb-3 text-lg font-bold leading-snug text-foreground">
             {coupon.name}
