@@ -17,7 +17,7 @@ type CouponCardProps = {
   coupon: Coupon;
   index: number;
   isFavorite: boolean;
-  onToggleFavorite: (id: string) => void;
+  onToggleFavorite: (id: number) => void;
 };
 
 const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardProps) => {
@@ -25,24 +25,28 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleToggleFavorite = () => {
-    onToggleFavorite(coupon.id);
+    onToggleFavorite(coupon.coupon_code);
     toast.success(isFavorite ? "已取消收藏" : "已加入收藏");
   };
 
   const handleCopyCode = () => {
-    if (coupon.code) {
-      navigator.clipboard.writeText(coupon.code);
-      setCopied(true);
-      toast.success("優惠碼已複製！");
-      setTimeout(() => setCopied(false), 2000);
-    }
+    navigator.clipboard.writeText(coupon.coupon_code.toString());
+    setCopied(true);
+    toast.success("優惠碼已複製！");
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  const savings = coupon.originalPrice - coupon.couponPrice;
+  const savings = coupon.original_price - coupon.price;
 
-  const hasAnyReplacements = coupon.itemDetails.some(
-    (item) => item.replacements && item.replacements.length > 0
+  const hasAnyFlavors = coupon.items.some(
+    (item) => item.flavors && item.flavors.length > 0
   );
+
+  // Format item display with count
+  const formatItemDisplay = (name: string, count: number) => {
+    if (count === 1) return name;
+    return `${name} x ${count}`;
+  };
 
   return (
     <>
@@ -74,7 +78,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               />
             </button>
             <h3 className="text-lg font-bold leading-snug text-foreground pr-8">
-              {coupon.code}-{coupon.name}
+              {coupon.coupon_code}-{coupon.name}
             </h3>
           </div>
 
@@ -83,7 +87,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
             {coupon.items.map((item, i) => (
               <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="h-1 w-1 rounded-full bg-primary/60" />
-                <span>{item}</span>
+                <span>{formatItemDisplay(item.name, item.count)}</span>
               </div>
             ))}
           </div>
@@ -93,12 +97,12 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
             <div>
               <p className="text-xs text-muted-foreground">優惠價</p>
               <p className="text-2xl font-black text-gradient">
-                ${coupon.couponPrice}
+                ${coupon.price}
               </p>
             </div>
             <div className="text-right">
               <p className="text-xs text-muted-foreground line-through">
-                原價 ${coupon.originalPrice}
+                原價 ${coupon.original_price}
               </p>
               <p className="text-sm font-semibold text-primary">
                 現省 ${savings}
@@ -108,22 +112,20 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
 
           {/* Code and validity */}
           <div className="flex items-center justify-between">
-            {coupon.code && (
-              <button
-                onClick={handleCopyCode}
-                className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-sm font-mono font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
-              >
-                {copied ? (
-                  <Check className="h-3.5 w-3.5 text-green-600" />
-                ) : (
-                  <Copy className="h-3.5 w-3.5" />
-                )}
-                <span>{coupon.code}</span>
-              </button>
-            )}
+            <button
+              onClick={handleCopyCode}
+              className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-sm font-mono font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+            >
+              {copied ? (
+                <Check className="h-3.5 w-3.5 text-green-600" />
+              ) : (
+                <Copy className="h-3.5 w-3.5" />
+              )}
+              <span>{coupon.coupon_code}</span>
+            </button>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
-              <span>至 {coupon.validUntil}</span>
+              <span>至 {coupon.end_date}</span>
             </div>
           </div>
 
@@ -146,7 +148,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
             asChild
           >
             <a
-              href={`https://www.kfcclub.com.tw/meal/${coupon.id}`}
+              href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2"
@@ -162,11 +164,11 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">{coupon.name}</DialogTitle>
+            <DialogTitle className="text-xl font-bold">{coupon.coupon_code}-{coupon.name}</DialogTitle>
             <DialogDescription asChild>
               <div className="flex items-center justify-between pt-2">
-                <span className="text-2xl font-black text-gradient">${coupon.couponPrice}</span>
-                <span className="text-sm text-muted-foreground line-through">原價 ${coupon.originalPrice}</span>
+                <span className="text-2xl font-black text-gradient">${coupon.price}</span>
+                <span className="text-sm text-muted-foreground line-through">原價 ${coupon.original_price}</span>
               </div>
             </DialogDescription>
           </DialogHeader>
@@ -179,34 +181,39 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               </p>
             </div>
 
-            {/* Items with replacements */}
+            {/* Items with flavors */}
             <div className="space-y-3">
               <h4 className="font-semibold text-foreground flex items-center gap-2">
                 <ArrowRightLeft className="h-4 w-4" />
-                可更換品項
+                可更換口味
               </h4>
 
-              {!hasAnyReplacements ? (
+              {!hasAnyFlavors ? (
                 <div className="rounded-lg bg-muted/50 p-4 text-center">
                   <p className="text-muted-foreground">沒有可以更換的品項</p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {coupon.itemDetails.map((item, i) => (
+                  {coupon.items.map((item, i) => (
                     <div key={i} className="rounded-lg border border-border p-3">
-                      <p className="font-medium text-foreground mb-2">{item.name}</p>
-                      {item.replacements && item.replacements.length > 0 ? (
+                      <p className="font-medium text-foreground mb-2">
+                        {formatItemDisplay(item.name, item.count)}
+                        {item.addition_price > 0 && (
+                          <span className="ml-2 text-sm text-primary">+${item.addition_price}</span>
+                        )}
+                      </p>
+                      {item.flavors && item.flavors.length > 0 ? (
                         <div className="space-y-1.5">
-                          {item.replacements.map((replacement, j) => (
+                          {item.flavors.map((flavor, j) => (
                             <div
                               key={j}
                               className="flex items-center justify-between text-sm bg-secondary/50 rounded-md px-3 py-1.5"
                             >
                               <span className="text-secondary-foreground">
-                                → {replacement.name}
+                                → {flavor.name}
                               </span>
-                              <span className={`font-medium ${replacement.price === 0 ? 'text-green-600' : 'text-primary'}`}>
-                                {replacement.price === 0 ? '免費' : `+$${replacement.price}`}
+                              <span className={`font-medium ${flavor.addition_price === 0 ? 'text-green-600' : 'text-primary'}`}>
+                                {flavor.addition_price === 0 ? '免費' : `+$${flavor.addition_price}`}
                               </span>
                             </div>
                           ))}
@@ -229,7 +236,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               asChild
             >
               <a
-                href={`https://www.kfcclub.com.tw/meal/${coupon.id}`}
+                href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2"

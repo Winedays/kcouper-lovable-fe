@@ -34,22 +34,30 @@ const Index = () => {
     setShowFavoritesOnly((prev) => !prev);
   }, []);
 
-  const checkItemMatchesFilter = (item: string, filter: ItemFilterId): boolean => {
-    // Special case for drinks - match 可樂, 雪碧, 紅茶
+  const checkItemMatchesFilter = (itemName: string, filter: ItemFilterId): boolean => {
+    // Special case for drinks - match 可樂, 雪碧, 紅茶, etc.
     if (filter === "飲料") {
-      return item.includes("可樂") || item.includes("雪碧") || item.includes("紅茶");
+      return itemName.includes("可樂") || itemName.includes("雪碧") || itemName.includes("紅茶") || itemName.includes("綠茶") || itemName.includes("奶茶") || itemName.includes("咖啡");
     }
     // Special case for burgers - match 堡
     if (filter === "漢堡") {
-      return item.includes("堡");
+      return itemName.includes("堡");
     }
-    return item.includes(filter);
+    // Special case for chicken
+    if (filter === "炸雞") {
+      return itemName.includes("雞") && !itemName.includes("雞塊") && !itemName.includes("雞腿堡");
+    }
+    // Special case for fries
+    if (filter === "薯條") {
+      return itemName.includes("薯");
+    }
+    return itemName.includes(filter);
   };
 
   const filteredAndSortedCoupons = useMemo(() => {
     const filtered = coupons.filter((coupon) => {
       // Favorites filter
-      if (showFavoritesOnly && !favorites.includes(coupon.id)) {
+      if (showFavoritesOnly && !favorites.includes(coupon.coupon_code)) {
         return false;
       }
 
@@ -57,7 +65,7 @@ const Index = () => {
       const matchesFilter =
         activeFilters.length === 0 ||
         activeFilters.every((filter) =>
-          coupon.items.some((item) => checkItemMatchesFilter(item, filter))
+          coupon.items.some((item) => checkItemMatchesFilter(item.name, filter))
         );
 
       // Search filter
@@ -65,8 +73,9 @@ const Index = () => {
       const matchesSearch =
         searchQuery === "" ||
         coupon.name.toLowerCase().includes(searchLower) ||
-        coupon.items.some((item) => item.toLowerCase().includes(searchLower)) ||
-        coupon.code?.toLowerCase().includes(searchLower);
+        coupon.items.some((item) => item.name.toLowerCase().includes(searchLower)) ||
+        coupon.coupon_code.toString().includes(searchLower) ||
+        coupon.product_code.toLowerCase().includes(searchLower);
 
       return matchesFilter && matchesSearch;
     });
@@ -75,21 +84,21 @@ const Index = () => {
     return [...filtered].sort((a, b) => {
       switch (sortBy) {
         case "code-asc":
-          return (a.code || "").localeCompare(b.code || "");
+          return a.coupon_code - b.coupon_code;
         case "code-desc":
-          return (b.code || "").localeCompare(a.code || "");
+          return b.coupon_code - a.coupon_code;
         case "price-asc":
-          return a.couponPrice - b.couponPrice;
+          return a.price - b.price;
         case "price-desc":
-          return b.couponPrice - a.couponPrice;
+          return b.price - a.price;
         case "discount-desc":
           return b.discount - a.discount;
         case "discount-asc":
           return a.discount - b.discount;
         case "expiry-asc":
-          return new Date(a.validUntil).getTime() - new Date(b.validUntil).getTime();
+          return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
         case "expiry-desc":
-          return new Date(b.validUntil).getTime() - new Date(a.validUntil).getTime();
+          return new Date(b.end_date).getTime() - new Date(a.end_date).getTime();
         default:
           return 0;
       }
