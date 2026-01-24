@@ -92,6 +92,9 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
             ))}
           </div>
 
+          {/* Spacer to push bottom content */}
+          <div className="flex-1" />
+
           {/* Price section */}
           <div className="mb-4 flex items-end justify-between border-t border-border/50 pt-4">
             <p className="text-2xl font-black text-gradient">
@@ -122,9 +125,6 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               <span>{coupon.start_date} ~ {coupon.end_date}</span>
             </div>
           </div>
-
-          {/* Spacer to push buttons to bottom */}
-          <div className="flex-1" />
 
           {/* View options button */}
           <Button
