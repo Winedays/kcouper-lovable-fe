@@ -51,7 +51,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
   return (
     <>
       <Card
-        className="group relative overflow-hidden border-border/60 bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
+        className="group relative flex h-full flex-col overflow-hidden border-border/60 bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
         style={{
           animationDelay: `${index * 50}ms`,
         }}
@@ -63,7 +63,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
           </div>
         </div>
 
-        <div className="p-5">
+        <div className="flex flex-1 flex-col p-5">
           {/* Title with favorite button */}
           <div className="mb-3 flex items-start gap-2">
             <button
@@ -122,6 +122,9 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               <span>{coupon.start_date} ~ {coupon.end_date}</span>
             </div>
           </div>
+
+          {/* Spacer to push buttons to bottom */}
+          <div className="flex-1" />
 
           {/* View options button */}
           <Button
