@@ -74,7 +74,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               />
             </button>
             <h3 className="text-lg font-bold leading-snug text-foreground pr-8">
-              {coupon.name}
+              {coupon.code}-{coupon.name}
             </h3>
           </div>
 
