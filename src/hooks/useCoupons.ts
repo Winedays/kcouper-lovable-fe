@@ -121,36 +121,44 @@ export function useCoupons(): UseCouponsResult {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Wait a bit for scripts loaded in HTML head to be available
+        // Wait for scripts loaded in HTML head to be available
         let retries = 0;
-        const maxRetries = 10;
+        const maxRetries = 50; // 5 seconds max wait
         
         while ((!window.COUPON_DICT || !window.SINGLE_DICT) && retries < maxRetries) {
           await new Promise(resolve => setTimeout(resolve, 100));
           retries++;
         }
 
-        // If still not loaded, try loading dynamically
+        // If still not loaded, try loading dynamically with cache busting
         if (!window.COUPON_DICT) {
-          await loadScript("/coupon.js");
+          await loadScript(`/coupon.js?t=${Date.now()}`);
+          // Wait a bit for the script to execute
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
         if (!window.SINGLE_DICT) {
-          await loadScript("/single.js");
+          await loadScript(`/single.js?t=${Date.now()}`);
+          // Wait a bit for the script to execute
+          await new Promise(resolve => setTimeout(resolve, 200));
         }
 
-        // Final check
+        // Final check with fallback - if SINGLE_DICT still not available, proceed without price calculation
         if (!window.COUPON_DICT) {
           throw new Error("COUPON_DICT not found after loading coupon.js");
         }
-        if (!window.SINGLE_DICT) {
-          throw new Error("SINGLE_DICT not found after loading single.js");
-        }
 
         const couponDict: CouponDict = window.COUPON_DICT;
-        const singleDict: SingleDict = window.SINGLE_DICT;
-
-        // Process coupons with calculated prices
-        const processedCoupons = processCouponsWithPrices(couponDict.coupon_list, singleDict);
+        
+        // If SINGLE_DICT is available, calculate prices; otherwise use original data
+        let processedCoupons: Coupon[];
+        if (window.SINGLE_DICT) {
+          const singleDict: SingleDict = window.SINGLE_DICT;
+          processedCoupons = processCouponsWithPrices(couponDict.coupon_list, singleDict);
+        } else {
+          // Use original coupon data without recalculating prices
+          console.warn("SINGLE_DICT not available, using original coupon prices");
+          processedCoupons = couponDict.coupon_list;
+        }
 
         // Build couponByCode with processed coupons
         const processedByCode: Record<string, Coupon> = {};
