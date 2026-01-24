@@ -9,25 +9,24 @@ const Header = ({ lastUpdate }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-primary">
-              <span className="text-lg font-black text-primary-foreground">K</span>
-            </div>
-            <span className="text-xl font-bold tracking-tight">
-              <span className="text-gradient">KCouper</span>
-            </span>
+        <div className="flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-primary">
+            <span className="text-lg font-black text-primary-foreground">K</span>
           </div>
-          {lastUpdate && (
-            <div className="hidden items-center gap-1 text-xs text-muted-foreground sm:flex">
-              <Clock className="h-3 w-3" />
-              <span>更新: {lastUpdate}</span>
-            </div>
-          )}
+          <span className="text-xl font-bold tracking-tight">
+            <span className="text-gradient">KCouper</span>
+          </span>
         </div>
 
 
         <nav className="flex items-center gap-2">
+          {lastUpdate && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span className="hidden sm:inline">更新:</span>
+              <span>{lastUpdate}</span>
+            </div>
+          )}
           <a
             href="https://github.com/Winedays/KCouper/blob/master/CHANGELOG.md"
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
