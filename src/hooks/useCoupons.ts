@@ -121,19 +121,24 @@ export function useCoupons(): UseCouponsResult {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load both scripts if not already loaded
-        const loadPromises: Promise<void>[] = [];
+        // Wait a bit for scripts loaded in HTML head to be available
+        let retries = 0;
+        const maxRetries = 10;
         
+        while ((!window.COUPON_DICT || !window.SINGLE_DICT) && retries < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          retries++;
+        }
+
+        // If still not loaded, try loading dynamically
         if (!window.COUPON_DICT) {
-          loadPromises.push(loadScript("/coupon.js"));
+          await loadScript("/coupon.js");
         }
         if (!window.SINGLE_DICT) {
-          loadPromises.push(loadScript("/single.js"));
+          await loadScript("/single.js");
         }
 
-        await Promise.all(loadPromises);
-
-        // Verify data is loaded
+        // Final check
         if (!window.COUPON_DICT) {
           throw new Error("COUPON_DICT not found after loading coupon.js");
         }
