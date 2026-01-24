@@ -3,6 +3,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { ArrowUpDown } from "lucide-react";
 
@@ -37,8 +38,8 @@ const SortSelect = ({ value, onChange }: SortSelectProps) => {
     <div className="flex items-center gap-2">
       <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
       <Select value={value} onValueChange={(val) => onChange(val as SortOption)}>
-        <SelectTrigger className="w-[120px] bg-background">
-          <span className="text-sm">排序方式</span>
+        <SelectTrigger className="w-[160px] bg-background">
+          <SelectValue placeholder="排序方式" />
         </SelectTrigger>
         <SelectContent className="bg-background z-50">
           {sortOptions.map((option) => (
