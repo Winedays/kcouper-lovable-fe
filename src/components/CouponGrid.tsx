@@ -4,8 +4,8 @@ import { PackageOpen } from "lucide-react";
 
 type CouponGridProps = {
   coupons: Coupon[];
-  isFavorite: (id: string) => boolean;
-  onToggleFavorite: (id: string) => void;
+  isFavorite: (id: number) => boolean;
+  onToggleFavorite: (id: number) => void;
 };
 
 const CouponGrid = ({ coupons, isFavorite, onToggleFavorite }: CouponGridProps) => {
@@ -25,10 +25,10 @@ const CouponGrid = ({ coupons, isFavorite, onToggleFavorite }: CouponGridProps) 
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {coupons.map((coupon, index) => (
         <CouponCard
-          key={coupon.id}
+          key={coupon.coupon_code}
           coupon={coupon}
           index={index}
-          isFavorite={isFavorite(coupon.id)}
+          isFavorite={isFavorite(coupon.coupon_code)}
           onToggleFavorite={onToggleFavorite}
         />
       ))}

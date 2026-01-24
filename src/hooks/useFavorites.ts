@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 const STORAGE_KEY = "kfc-coupon-favorites";
 
 export const useFavorites = () => {
-  const [favorites, setFavorites] = useState<string[]>(() => {
+  const [favorites, setFavorites] = useState<number[]>(() => {
     if (typeof window === "undefined") return [];
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -13,14 +13,14 @@ export const useFavorites = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
   }, [favorites]);
 
-  const toggleFavorite = useCallback((id: string) => {
+  const toggleFavorite = useCallback((couponCode: number) => {
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((fid) => fid !== id) : [...prev, id]
+      prev.includes(couponCode) ? prev.filter((code) => code !== couponCode) : [...prev, couponCode]
     );
   }, []);
 
   const isFavorite = useCallback(
-    (id: string) => favorites.includes(id),
+    (couponCode: number) => favorites.includes(couponCode),
     [favorites]
   );
 
