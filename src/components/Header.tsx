@@ -14,9 +14,6 @@ const Header = () => {
           </span>
         </div>
 
-        <p className="hidden text-center text-sm text-muted-foreground md:block">
-          本網站僅提供優惠資訊整理，非 KFC 官方網站
-        </p>
 
         <nav className="flex items-center gap-2">
           <a
