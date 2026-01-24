@@ -13,7 +13,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<ItemFilterId[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<SortOption>("code");
+  const [sortBy, setSortBy] = useState<SortOption>("code-asc");
   
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
 
@@ -74,16 +74,22 @@ const Index = () => {
     // Sort the filtered coupons
     return [...filtered].sort((a, b) => {
       switch (sortBy) {
-        case "code":
+        case "code-asc":
           return (a.code || "").localeCompare(b.code || "");
+        case "code-desc":
+          return (b.code || "").localeCompare(a.code || "");
         case "price-asc":
           return a.couponPrice - b.couponPrice;
         case "price-desc":
           return b.couponPrice - a.couponPrice;
-        case "discount":
-          return b.discount - a.discount; // Higher discount first
-        case "expiry":
+        case "discount-desc":
+          return b.discount - a.discount;
+        case "discount-asc":
+          return a.discount - b.discount;
+        case "expiry-asc":
           return new Date(a.validUntil).getTime() - new Date(b.validUntil).getTime();
+        case "expiry-desc":
+          return new Date(b.validUntil).getTime() - new Date(a.validUntil).getTime();
         default:
           return 0;
       }

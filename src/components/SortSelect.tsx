@@ -7,7 +7,15 @@ import {
 } from "@/components/ui/select";
 import { ArrowUpDown } from "lucide-react";
 
-export type SortOption = "code" | "price-asc" | "price-desc" | "discount" | "expiry";
+export type SortOption = 
+  | "code-asc" 
+  | "code-desc" 
+  | "price-asc" 
+  | "price-desc" 
+  | "discount-asc" 
+  | "discount-desc" 
+  | "expiry-asc" 
+  | "expiry-desc";
 
 type SortSelectProps = {
   value: SortOption;
@@ -15,11 +23,14 @@ type SortSelectProps = {
 };
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: "code", label: "代碼" },
+  { value: "code-asc", label: "代碼（A→Z）" },
+  { value: "code-desc", label: "代碼（Z→A）" },
   { value: "price-asc", label: "價格（低→高）" },
   { value: "price-desc", label: "價格（高→低）" },
-  { value: "discount", label: "折扣比例" },
-  { value: "expiry", label: "到期日" },
+  { value: "discount-desc", label: "折扣（高→低）" },
+  { value: "discount-asc", label: "折扣（低→高）" },
+  { value: "expiry-asc", label: "到期日（近→遠）" },
+  { value: "expiry-desc", label: "到期日（遠→近）" },
 ];
 
 const SortSelect = ({ value, onChange }: SortSelectProps) => {
