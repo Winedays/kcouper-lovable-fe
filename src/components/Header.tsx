@@ -1,5 +1,3 @@
-import { ExternalLink } from "lucide-react";
-import { Button } from "./ui/button";
 import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
@@ -17,21 +15,6 @@ const Header = () => {
 
         <nav className="flex items-center gap-2">
           <ThemeToggle />
-          <Button
-            variant="hero"
-            size="sm"
-            asChild
-          >
-            <a
-              href="https://www.kfcclub.com.tw/Order"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-              <span>前往點餐</span>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
         </nav>
       </div>
     </header>
