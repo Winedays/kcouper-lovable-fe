@@ -13,7 +13,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<ItemFilterId[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<SortOption>("code-asc");
+  const [sortBy, setSortBy] = useState<SortOption>("price-asc");
   const [searchAllOptions, setSearchAllOptions] = useState(false);
   
   const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
