@@ -59,7 +59,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
         {/* Discount badge */}
         <div className="absolute -right-8 top-4 rotate-45">
           <div className="bg-gradient-primary px-10 py-1 text-xs font-bold text-primary-foreground shadow-md">
-            省 {coupon.discount}%
+            {coupon.discount} 折
           </div>
         </div>
 
