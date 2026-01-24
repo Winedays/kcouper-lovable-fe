@@ -56,12 +56,14 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
           animationDelay: `${index * 50}ms`,
         }}
       >
-        {/* Discount badge */}
-        <div className="absolute -right-8 top-4 rotate-45">
-          <div className="bg-gradient-primary px-10 py-1 text-xs font-bold text-primary-foreground shadow-md">
-            {coupon.discount} 折
+        {/* Discount badge - only show when original_price > 0 */}
+        {coupon.original_price > 0 && (
+          <div className="absolute -right-8 top-4 rotate-45">
+            <div className="bg-gradient-primary px-10 py-1 text-xs font-bold text-primary-foreground shadow-md">
+              {coupon.discount} 折
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex flex-1 flex-col p-5">
           {/* Title with favorite button */}
@@ -100,11 +102,14 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
             <p className="text-2xl font-black text-gradient">
               ${coupon.price}
             </p>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground line-through">
-                原價 ${coupon.original_price}
-              </p>
-            </div>
+            {/* Only show original price when > 0 */}
+            {coupon.original_price > 0 && (
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground line-through">
+                  原價 ${coupon.original_price}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Code and validity */}
