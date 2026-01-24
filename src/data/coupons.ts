@@ -60,9 +60,30 @@ export type CouponDict = {
   last_update: string;
 };
 
-// Declare global COUPON_DICT from coupon.js
+/**
+ * @typedef {Object} SingleItem
+ * @property {string} code - 產品代碼
+ * @property {string} name - 產品名稱
+ * @property {number} price - 價格
+ * @property {string} nutrition - 營養資訊
+ */
+export type SingleItem = {
+  code: string;
+  name: string;
+  price: number;
+  nutrition: string;
+};
+
+/**
+ * @typedef {Object} SingleDict
+ * @description Map of item name to SingleItem object
+ */
+export type SingleDict = Record<string, SingleItem>;
+
+// Declare global COUPON_DICT and SINGLE_DICT from external js files
 declare global {
   interface Window {
     COUPON_DICT?: CouponDict;
+    SINGLE_DICT?: SingleDict;
   }
 }
