@@ -94,9 +94,11 @@ const Index = () => {
         case "price-desc":
           return b.price - a.price;
         case "discount-desc":
-          return b.discount - a.discount;
-        case "discount-asc":
+          // Lower discount value = better deal (e.g., 7折 > 9折), so sort ascending
           return a.discount - b.discount;
+        case "discount-asc":
+          // Higher discount value = less discount, so sort descending
+          return b.discount - a.discount;
         case "expiry-asc":
           return new Date(a.end_date).getTime() - new Date(b.end_date).getTime();
         case "expiry-desc":
