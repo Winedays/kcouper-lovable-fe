@@ -1,10 +1,11 @@
 import { useState, useMemo, useCallback } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import ItemFilter, { type ItemFilterId, filterMatchRules } from "@/components/ItemFilter";
+import SearchPanel from "@/components/SearchPanel";
+import { type ItemFilterId, filterMatchRules } from "@/components/ItemFilter";
 import CouponGrid from "@/components/CouponGrid";
 import ScrollToTop from "@/components/ScrollToTop";
-import SortSelect, { type SortOption } from "@/components/SortSelect";
+import { type SortOption } from "@/components/SortSelect";
 import { coupons } from "@/data/coupons";
 import { useFavorites } from "@/hooks/useFavorites";
 
@@ -34,12 +35,6 @@ const Index = () => {
     setShowFavoritesOnly((prev) => !prev);
   }, []);
 
-  /**
-   * Check if an item name matches a filter using the filterMatchRules
-   * @param itemName - The name of the item to check
-   * @param filter - The filter ID to match against
-   * @returns True if the item matches any of the filter's match rules
-   */
   /**
    * Check if a name matches a filter using the filterMatchRules
    * @param name - The name to check (item name or flavor name)
@@ -116,43 +111,25 @@ const Index = () => {
       <Header />
       
       <main className="flex-1">
-        <Hero
+        <Hero couponCount={coupons.length} />
+
+        <SearchPanel
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          couponCount={coupons.length}
           searchAllOptions={searchAllOptions}
           onSearchAllOptionsChange={setSearchAllOptions}
+          activeFilters={activeFilters}
+          onFilterToggle={handleFilterToggle}
+          onClearAll={handleClearFilters}
+          showFavoritesOnly={showFavoritesOnly}
+          onToggleFavorites={handleToggleFavorites}
+          favoritesCount={favoritesCount}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          resultCount={filteredAndSortedCoupons.length}
         />
 
-        <section className="container py-8 md:py-12">
-          {/* Filter section */}
-          <div className="mb-8">
-            <h2 className="mb-4 text-sm font-medium text-muted-foreground">
-              依餐點篩選
-            </h2>
-            <ItemFilter
-              activeFilters={activeFilters}
-              onFilterToggle={handleFilterToggle}
-              onClearAll={handleClearFilters}
-              showFavoritesOnly={showFavoritesOnly}
-              onToggleFavorites={handleToggleFavorites}
-              favoritesCount={favoritesCount}
-            />
-          </div>
-
-          {/* Results info with sort */}
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              共找到{" "}
-              <span className="font-semibold text-foreground">
-                {filteredAndSortedCoupons.length}
-              </span>{" "}
-              張優惠券
-            </p>
-            <SortSelect value={sortBy} onChange={setSortBy} />
-          </div>
-
-          {/* Coupon grid */}
+        <section className="container py-6">
           <CouponGrid
             coupons={filteredAndSortedCoupons}
             isFavorite={isFavorite}
@@ -161,7 +138,6 @@ const Index = () => {
         </section>
       </main>
 
-      
       <ScrollToTop />
     </div>
   );
