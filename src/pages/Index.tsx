@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import ItemFilter, { type ItemFilterId } from "@/components/ItemFilter";
 import CouponGrid from "@/components/CouponGrid";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { coupons } from "@/data/coupons";
 
 const Index = () => {
@@ -96,6 +97,7 @@ const Index = () => {
       </main>
 
       <Footer />
+      <ScrollToTop />
     </div>
   );
 };
