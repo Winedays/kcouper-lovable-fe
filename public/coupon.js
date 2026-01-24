@@ -1,4 +1,4 @@
-const COUPON_DICT = {
+window.COUPON_DICT = {
   "coupon_by_code": {
     "25305": {
       "name": "遠雄人壽繽紛",
