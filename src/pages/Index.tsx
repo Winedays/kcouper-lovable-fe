@@ -18,6 +18,10 @@ const Index = () => {
     );
   }, []);
 
+  const handleClearFilters = useCallback(() => {
+    setActiveFilters([]);
+  }, []);
+
   const checkItemMatchesFilter = (item: string, filter: ItemFilterId): boolean => {
     // Special case for drinks - match 可樂, 雪碧, 紅茶
     if (filter === "飲料") {
@@ -71,6 +75,7 @@ const Index = () => {
             <ItemFilter
               activeFilters={activeFilters}
               onFilterToggle={handleFilterToggle}
+              onClearAll={handleClearFilters}
             />
           </div>
 
