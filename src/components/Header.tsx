@@ -1,4 +1,4 @@
-import { Github, Mail } from "lucide-react";
+import { Github, Mail, FileText } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
@@ -19,6 +19,14 @@ const Header = () => {
         </p>
 
         <nav className="flex items-center gap-2">
+          <a
+            href="https://github.com/Winedays/KCouper/blob/master/CHANGELOG.md"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            title="更新日誌"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">更新日誌</span>
+          </a>
           <a
             href="mailto:contact@kcouper.com"
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
