@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import ItemFilter, { type ItemFilterId } from "@/components/ItemFilter";
@@ -8,24 +8,36 @@ import { coupons } from "@/data/coupons";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState<ItemFilterId>("all");
+  const [activeFilters, setActiveFilters] = useState<ItemFilterId[]>([]);
+
+  const handleFilterToggle = useCallback((filter: ItemFilterId) => {
+    setActiveFilters((prev) =>
+      prev.includes(filter)
+        ? prev.filter((f) => f !== filter)
+        : [...prev, filter]
+    );
+  }, []);
+
+  const checkItemMatchesFilter = (item: string, filter: ItemFilterId): boolean => {
+    // Special case for drinks - match 可樂, 雪碧, 紅茶
+    if (filter === "飲料") {
+      return item.includes("可樂") || item.includes("雪碧") || item.includes("紅茶");
+    }
+    // Special case for burgers - match 堡
+    if (filter === "漢堡") {
+      return item.includes("堡");
+    }
+    return item.includes(filter);
+  };
 
   const filteredCoupons = useMemo(() => {
     return coupons.filter((coupon) => {
-      // Item filter - check if any item contains the filter keyword
+      // If no filters selected, show all
       const matchesFilter =
-        activeFilter === "all" ||
-        coupon.items.some((item) => {
-          // Special case for drinks - match 可樂, 雪碧, 紅茶
-          if (activeFilter === "可樂") {
-            return item.includes("可樂") || item.includes("雪碧") || item.includes("紅茶");
-          }
-          // Special case for burgers - match 堡
-          if (activeFilter === "漢堡") {
-            return item.includes("堡");
-          }
-          return item.includes(activeFilter);
-        });
+        activeFilters.length === 0 ||
+        activeFilters.every((filter) =>
+          coupon.items.some((item) => checkItemMatchesFilter(item, filter))
+        );
 
       // Search filter
       const searchLower = searchQuery.toLowerCase();
@@ -37,7 +49,7 @@ const Index = () => {
 
       return matchesFilter && matchesSearch;
     });
-  }, [searchQuery, activeFilter]);
+  }, [searchQuery, activeFilters]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -57,8 +69,8 @@ const Index = () => {
               依餐點篩選
             </h2>
             <ItemFilter
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
+              activeFilters={activeFilters}
+              onFilterToggle={handleFilterToggle}
             />
           </div>
 
