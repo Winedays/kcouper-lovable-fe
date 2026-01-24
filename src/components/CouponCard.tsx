@@ -52,19 +52,6 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
           animationDelay: `${index * 50}ms`,
         }}
       >
-        {/* Favorite button */}
-        <button
-          onClick={handleToggleFavorite}
-          className="absolute left-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm transition-all hover:scale-110"
-          aria-label={isFavorite ? "取消收藏" : "加入收藏"}
-        >
-          <Heart
-            className={`h-4 w-4 transition-colors ${
-              isFavorite ? "fill-primary text-primary" : "text-muted-foreground"
-            }`}
-          />
-        </button>
-
         {/* Discount badge */}
         <div className="absolute -right-8 top-4 rotate-45">
           <div className="bg-gradient-primary px-10 py-1 text-xs font-bold text-primary-foreground shadow-md">
@@ -72,11 +59,24 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
           </div>
         </div>
 
-        <div className="p-5 pt-12">
-          {/* Title */}
-          <h3 className="mb-3 text-lg font-bold leading-snug text-foreground">
-            {coupon.name}
-          </h3>
+        <div className="p-5">
+          {/* Title with favorite button */}
+          <div className="mb-3 flex items-start gap-2">
+            <button
+              onClick={handleToggleFavorite}
+              className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all hover:scale-110"
+              aria-label={isFavorite ? "取消收藏" : "加入收藏"}
+            >
+              <Heart
+                className={`h-4 w-4 transition-colors ${
+                  isFavorite ? "fill-primary text-primary" : "text-muted-foreground hover:text-primary/60"
+                }`}
+              />
+            </button>
+            <h3 className="text-lg font-bold leading-snug text-foreground pr-8">
+              {coupon.name}
+            </h3>
+          </div>
 
           {/* Items list */}
           <div className="mb-4 space-y-1">
