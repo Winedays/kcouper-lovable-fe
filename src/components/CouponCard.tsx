@@ -72,7 +72,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
           </div>
         </div>
 
-        <div className="p-5">
+        <div className="p-5 pt-12">
           {/* Title */}
           <h3 className="mb-3 text-lg font-bold leading-snug text-foreground">
             {coupon.name}
