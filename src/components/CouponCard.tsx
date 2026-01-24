@@ -126,34 +126,35 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
             </div>
           </div>
 
-          {/* View options button */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-4 w-full"
-            onClick={() => setIsDialogOpen(true)}
-          >
-            <ChefHat className="h-4 w-4 mr-2" />
-            查看餐點選項
-          </Button>
-
-          {/* Order button */}
-          <Button
-            variant="hero"
-            size="sm"
-            className="mt-2 w-full"
-            asChild
-          >
-            <a
-              href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2"
+          {/* Action buttons */}
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => setIsDialogOpen(true)}
             >
-              <span>前往點餐</span>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
+              <ChefHat className="h-4 w-4 mr-2" />
+              查看餐點選項
+            </Button>
+
+            <Button
+              variant="hero"
+              size="sm"
+              className="flex-1"
+              asChild
+            >
+              <a
+                href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2"
+              >
+                <span>前往點餐</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
         </div>
       </Card>
 
