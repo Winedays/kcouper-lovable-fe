@@ -1,5 +1,6 @@
 import { ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
+import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
   return (
@@ -14,7 +15,8 @@ const Header = () => {
           </span>
         </div>
 
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-2">
+          <ThemeToggle />
           <Button
             variant="hero"
             size="sm"
