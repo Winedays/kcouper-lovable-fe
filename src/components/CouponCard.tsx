@@ -1,10 +1,10 @@
 import { type Coupon } from "@/data/coupons";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
-import { Copy, Check, Calendar } from "lucide-react";
+import { Button } from "./ui/button";
+import { Copy, Check, Calendar, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-
 type CouponCardProps = {
   coupon: Coupon;
   index: number;
@@ -97,6 +97,24 @@ const CouponCard = ({ coupon, index }: CouponCardProps) => {
             <span>至 {coupon.validUntil}</span>
           </div>
         </div>
+
+        {/* Order button */}
+        <Button
+          variant="hero"
+          size="sm"
+          className="mt-4 w-full"
+          asChild
+        >
+          <a
+            href={`https://www.kfcclub.com.tw/meal/${coupon.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2"
+          >
+            <span>前往點餐</span>
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        </Button>
       </div>
     </Card>
   );
