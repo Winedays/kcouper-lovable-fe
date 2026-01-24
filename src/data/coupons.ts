@@ -76,7 +76,7 @@ export const coupons: Coupon[] = [
     name: "咔啦雞腿堡套餐",
     items: ["咔啦雞腿堡", "薯條(中)", "可樂(中)"],
     itemDetails: [
-      { name: "咔啦雞腿堡", replacements: [{ name: "辣味咔啦雞腿堡", price: 0 }] },
+      { name: "咔啦雞腿堡" },
       { name: "薯條(中)", replacements: [{ name: "薯條(大)", price: 20 }, { name: "蛋塔", price: 15 }] },
       { name: "可樂(中)", replacements: [{ name: "可樂(大)", price: 15 }, { name: "雪碧(中)", price: 0 }] },
     ],
