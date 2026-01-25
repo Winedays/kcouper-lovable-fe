@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const STORAGE_KEY = "kfc-coupon-favorites";
+const STORAGE_KEY = "favoriteCoupons";
 
 export const useFavorites = () => {
   const [favorites, setFavorites] = useState<number[]>(() => {
