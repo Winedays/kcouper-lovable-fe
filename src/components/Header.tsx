@@ -1,4 +1,4 @@
-import { Github, Mail, FileText, Clock } from "lucide-react";
+import { Github, Mail, FileText, Clock, ArrowRightLeft } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 type HeaderProps = {
@@ -27,6 +27,14 @@ const Header = ({ lastUpdate }: HeaderProps) => {
               <span>{lastUpdate}</span>
             </div>
           )}
+          <a
+            href="/v1"
+            className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            title="切換至舊版"
+          >
+            <ArrowRightLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">舊版</span>
+          </a>
           <a
             href="https://github.com/Winedays/KCouper/blob/master/CHANGELOG.md"
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
