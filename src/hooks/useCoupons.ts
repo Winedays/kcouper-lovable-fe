@@ -82,26 +82,82 @@ function processCouponsWithPrices(coupons: Coupon[], singleDict: SingleDict): Co
   });
 }
 
-/**
- * Load a script dynamically and return a promise
- * @param {string} src - Script source URL
- * @returns {Promise<void>}
- */
-function loadScript(src: string): Promise<void> {
+function loadDynamicScript(baseSrc: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    // Check if script already exists
-    const existingScript = document.querySelector(`script[src="${src}"]`);
-    if (existingScript) {
-      resolve();
-      return;
-    }
-
+    const src = `${baseSrc}?t=${Date.now()}`;
     const script = document.createElement("script");
     script.src = src;
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error(`Failed to load ${src}`));
     document.head.appendChild(script);
+  });
+}
+
+/**
+ * Ensure data script is loaded.
+ * Checks for global variable, existing script tag, or loads dynamically.
+ * @param {string} url - Script source URL
+ * @param {string} variableName - Global variable name to check
+ * @returns {Promise<void>}
+ */
+function ensureDataLoaded(url: string, variableName: keyof Window): Promise<void> {
+  if (window[variableName]) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const scripts = document.querySelectorAll(`script[src*="${url}"]`);
+    let existingScript: HTMLScriptElement | null = null;
+
+    // Look for an async/defer script that might be loading
+    for (let i = 0; i < scripts.length; i++) {
+      const s = scripts[i] as HTMLScriptElement;
+      if (s.async || s.defer) {
+        existingScript = s;
+        break;
+      }
+    }
+
+    if (existingScript) {
+      let cleaned = false;
+      const cleanup = () => {
+        if (cleaned) return;
+        cleaned = true;
+        existingScript!.removeEventListener('load', onLoad);
+        existingScript!.removeEventListener('error', onError);
+        clearTimeout(timeoutId);
+      };
+
+      const onLoad = () => {
+        cleanup();
+        if (window[variableName]) {
+          resolve();
+        } else {
+          // Script loaded but variable missing? Fallback to dynamic load
+          loadDynamicScript(url).then(resolve).catch(reject);
+        }
+      };
+
+      const onError = () => {
+        cleanup();
+        loadDynamicScript(url).then(resolve).catch(reject);
+      };
+
+      existingScript.addEventListener('load', onLoad);
+      existingScript.addEventListener('error', onError);
+
+      // Timeout for existing script
+      const timeoutId = setTimeout(() => {
+        cleanup();
+        loadDynamicScript(url).then(resolve).catch(reject);
+      }, 3000);
+
+      return;
+    }
+
+    // No existing async script found, or blocking script failed (since var is missing)
+    loadDynamicScript(url).then(resolve).catch(reject);
   });
 }
 
@@ -121,28 +177,12 @@ export function useCoupons(): UseCouponsResult {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Wait for scripts loaded in HTML head to be available
-        let retries = 0;
-        const maxRetries = 50; // 5 seconds max wait
-        
-        while ((!window.COUPON_DICT || !window.SINGLE_DICT) && retries < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          retries++;
-        }
+        // Load both scripts in parallel if needed
+        await Promise.all([
+          ensureDataLoaded('/coupon.js', 'COUPON_DICT'),
+          ensureDataLoaded('/single.js', 'SINGLE_DICT')
+        ]);
 
-        // If still not loaded, try loading dynamically with cache busting
-        if (!window.COUPON_DICT) {
-          await loadScript(`/coupon.js?t=${Date.now()}`);
-          // Wait a bit for the script to execute
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
-        if (!window.SINGLE_DICT) {
-          await loadScript(`/single.js?t=${Date.now()}`);
-          // Wait a bit for the script to execute
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
-
-        // Final check with fallback - if SINGLE_DICT still not available, proceed without price calculation
         if (!window.COUPON_DICT) {
           throw new Error("COUPON_DICT not found after loading coupon.js");
         }
@@ -172,6 +212,7 @@ export function useCoupons(): UseCouponsResult {
         setLastUpdate(couponDict.last_update);
         setIsLoading(false);
       } catch (err) {
+        console.error(err);
         setError(err instanceof Error ? err : new Error("Unknown error loading data"));
         setIsLoading(false);
       }
