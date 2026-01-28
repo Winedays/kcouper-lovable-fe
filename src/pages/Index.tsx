@@ -51,7 +51,7 @@ const Index = () => {
   const filteredAndSortedCoupons = useMemo(() => {
     const filtered = coupons.filter((coupon) => {
       // Favorites filter
-      if (showFavoritesOnly && !favorites.includes(coupon.coupon_code)) {
+      if (showFavoritesOnly && !favorites.has(coupon.coupon_code)) {
         return false;
       }
 
