@@ -3,7 +3,7 @@ import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Copy, Check, Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart } from "lucide-react";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -255,4 +255,4 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
   );
 };
 
-export default CouponCard;
+export default memo(CouponCard);
