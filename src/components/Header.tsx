@@ -28,7 +28,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
             </div>
           )}
           <a
-            href="/v1"
+            href="/v1/index.html"
             className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             title="切換至舊版"
           >

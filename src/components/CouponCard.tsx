@@ -74,13 +74,12 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               aria-label={isFavorite ? "取消收藏" : "加入收藏"}
             >
               <Heart
-                className={`h-4 w-4 transition-colors ${
-                  isFavorite ? "fill-primary text-primary" : "text-muted-foreground hover:text-primary/60"
-                }`}
+                className={`h-4 w-4 transition-colors ${isFavorite ? "fill-primary text-primary" : "text-muted-foreground hover:text-primary/60"
+                  }`}
               />
             </button>
             <h3 className="text-lg font-bold leading-snug text-foreground pr-8">
-              {coupon.coupon_code}-{coupon.name}
+              {coupon.name}
             </h3>
           </div>
 
@@ -125,7 +124,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
               )}
               <span>{coupon.coupon_code}</span>
             </button>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
               <span>{coupon.start_date} ~ {coupon.end_date}</span>
             </div>
