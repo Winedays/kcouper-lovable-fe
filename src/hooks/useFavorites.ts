@@ -3,29 +3,35 @@ import { useState, useEffect, useCallback } from "react";
 const STORAGE_KEY = "favoriteCoupons";
 
 export const useFavorites = () => {
-  const [favorites, setFavorites] = useState<number[]>(() => {
-    if (typeof window === "undefined") return [];
+  const [favorites, setFavorites] = useState<Set<number>>(() => {
+    if (typeof window === "undefined") return new Set();
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    return stored ? new Set(JSON.parse(stored)) : new Set();
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(favorites)));
   }, [favorites]);
 
   const toggleFavorite = useCallback((couponCode: number) => {
-    setFavorites((prev) =>
-      prev.includes(couponCode) ? prev.filter((code) => code !== couponCode) : [...prev, couponCode]
-    );
+    setFavorites((prev) => {
+      const newFavorites = new Set(prev);
+      if (newFavorites.has(couponCode)) {
+        newFavorites.delete(couponCode);
+      } else {
+        newFavorites.add(couponCode);
+      }
+      return newFavorites;
+    });
   }, []);
 
   const isFavorite = useCallback(
-    (couponCode: number) => favorites.includes(couponCode),
+    (couponCode: number) => favorites.has(couponCode),
     [favorites]
   );
 
   const clearFavorites = useCallback(() => {
-    setFavorites([]);
+    setFavorites(new Set());
   }, []);
 
   return {
@@ -33,6 +39,6 @@ export const useFavorites = () => {
     toggleFavorite,
     isFavorite,
     clearFavorites,
-    favoritesCount: favorites.length,
+    favoritesCount: favorites.size,
   };
 };
