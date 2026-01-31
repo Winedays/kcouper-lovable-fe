@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import SearchPanel from "@/components/SearchPanel";
@@ -8,6 +8,15 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { type SortOption } from "@/components/SortSelect";
 import { useCoupons } from "@/hooks/useCoupons";
 import { useFavorites } from "@/hooks/useFavorites";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,7 +26,23 @@ const Index = () => {
   const [searchAllOptions, setSearchAllOptions] = useState(false);
   
   const { coupons, count: couponCount, lastUpdate, isLoading, error } = useCoupons();
-  const { favorites, toggleFavorite, isFavorite, favoritesCount } = useFavorites();
+  const { 
+    favorites, 
+    toggleFavorite, 
+    isFavorite, 
+    favoritesCount,
+    cleanupInvalidFavorites,
+    removedCoupons,
+    clearRemovedCoupons,
+  } = useFavorites();
+
+  // Check for invalid favorites when coupons are loaded
+  useEffect(() => {
+    if (coupons.length > 0) {
+      const validCodes = new Set(coupons.map((c) => c.coupon_code));
+      cleanupInvalidFavorites(validCodes);
+    }
+  }, [coupons, cleanupInvalidFavorites]);
 
   const handleFilterToggle = useCallback((filter: ItemFilterId) => {
     setActiveFilters((prev) =>
@@ -172,6 +197,34 @@ const Index = () => {
       </main>
 
       <ScrollToTop />
+
+      {/* Invalid favorites removed dialog */}
+      <AlertDialog open={removedCoupons.length > 0} onOpenChange={(open) => !open && clearRemovedCoupons()}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>收藏已更新</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                <p>
+                  以下 {removedCoupons.length} 張優惠券已過期或不再提供，已自動從收藏中移除：
+                </p>
+                <div className="max-h-32 overflow-y-auto rounded-md bg-muted p-2">
+                  {removedCoupons.map((code) => (
+                    <div key={code} className="text-sm font-mono">
+                      優惠碼：{code}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={clearRemovedCoupons}>
+              我知道了
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
