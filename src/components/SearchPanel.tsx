@@ -1,10 +1,16 @@
-import { Search, X, Heart, SlidersHorizontal } from "lucide-react";
+import { Search, X, Heart, SlidersHorizontal, Info } from "lucide-react";
 import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { itemFilters, type ItemFilterId } from "./ItemFilter";
 import SortSelect, { type SortOption } from "./SortSelect";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
 
 type SearchPanelProps = {
   searchQuery: string;
@@ -89,28 +95,44 @@ const SearchPanel = ({
           
           <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {/* Favorites filter */}
-            <button
-              onClick={onToggleFavorites}
-              className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
-                showFavoritesOnly
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              )}
-            >
-              <Heart className={cn("h-3.5 w-3.5", showFavoritesOnly && "fill-current")} />
-              <span>收藏</span>
-              {favoritesCount > 0 && (
-                <span className={cn(
-                  "rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                onClick={onToggleFavorites}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
                   showFavoritesOnly
-                    ? "bg-primary-foreground/20 text-primary-foreground"
-                    : "bg-primary/10 text-primary"
-                )}>
-                  {favoritesCount}
-                </span>
-              )}
-            </button>
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                )}
+              >
+                <Heart className={cn("h-3.5 w-3.5", showFavoritesOnly && "fill-current")} />
+                <span>收藏</span>
+                {favoritesCount > 0 && (
+                  <span className={cn(
+                    "rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                    showFavoritesOnly
+                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      : "bg-primary/10 text-primary"
+                  )}>
+                    {favoritesCount}
+                  </span>
+                )}
+              </button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button className="p-1 text-muted-foreground hover:text-foreground transition-colors">
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs text-center">
+                    <p className="text-xs">
+                      收藏功能會將資料儲存在瀏覽器的本地儲存空間中。如果換了裝置、清除瀏覽器資料或使用無痕模式，收藏記錄就會消失。
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
 
             {/* Divider */}
             <div className="h-5 w-px bg-border shrink-0" />
