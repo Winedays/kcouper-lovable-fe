@@ -6,11 +6,10 @@ import { cn } from "@/lib/utils";
 import { itemFilters, type ItemFilterId } from "./ItemFilter";
 import SortSelect, { type SortOption } from "./SortSelect";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./ui/popover";
 
 type SearchPanelProps = {
   searchQuery: string;
@@ -118,20 +117,18 @@ const SearchPanel = ({
                   </span>
                 )}
               </button>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button className="p-1 text-muted-foreground hover:text-foreground transition-colors">
-                      <Info className="h-3.5 w-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs text-center">
-                    <p className="text-xs">
-                      收藏功能會將資料儲存在瀏覽器的本地儲存空間中。如果換了裝置、清除瀏覽器資料或使用無痕模式，收藏記錄就會消失。
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button className="p-1 text-muted-foreground hover:text-foreground transition-colors">
+                    <Info className="h-3.5 w-3.5" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="max-w-xs text-center" side="bottom">
+                  <p className="text-xs text-muted-foreground">
+                    收藏功能會將資料儲存在瀏覽器的本地儲存空間中。如果換了裝置、清除瀏覽器資料或使用無痕模式，收藏記錄就會消失。
+                  </p>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Divider */}
