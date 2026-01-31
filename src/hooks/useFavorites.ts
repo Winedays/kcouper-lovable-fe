@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const STORAGE_KEY = "favoriteCoupons";
 
@@ -8,6 +8,9 @@ export const useFavorites = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? new Set(JSON.parse(stored)) : new Set();
   });
+  
+  const [removedCoupons, setRemovedCoupons] = useState<number[]>([]);
+  const hasCleanedRef = useRef(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(favorites)));
@@ -34,11 +37,49 @@ export const useFavorites = () => {
     setFavorites(new Set());
   }, []);
 
+  /**
+   * Clean up favorites that no longer exist in the coupon list
+   * @param validCouponCodes - Set of valid coupon codes from the current coupon list
+   * @returns Array of removed coupon codes
+   */
+  const cleanupInvalidFavorites = useCallback((validCouponCodes: Set<number>) => {
+    if (hasCleanedRef.current) return [];
+    hasCleanedRef.current = true;
+    
+    const invalidCodes: number[] = [];
+    
+    setFavorites((prev) => {
+      const newFavorites = new Set<number>();
+      prev.forEach((code) => {
+        if (validCouponCodes.has(code)) {
+          newFavorites.add(code);
+        } else {
+          invalidCodes.push(code);
+        }
+      });
+      
+      if (invalidCodes.length > 0) {
+        setRemovedCoupons(invalidCodes);
+      }
+      
+      return newFavorites;
+    });
+    
+    return invalidCodes;
+  }, []);
+
+  const clearRemovedCoupons = useCallback(() => {
+    setRemovedCoupons([]);
+  }, []);
+
   return {
     favorites,
     toggleFavorite,
     isFavorite,
     clearFavorites,
     favoritesCount: favorites.size,
+    cleanupInvalidFavorites,
+    removedCoupons,
+    clearRemovedCoupons,
   };
 };
