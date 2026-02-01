@@ -190,7 +190,7 @@ const Index = () => {
         <section className="container py-6">
           <CouponGrid
             coupons={filteredAndSortedCoupons}
-            isFavorite={isFavorite}
+            favorites={favorites}
             onToggleFavorite={toggleFavorite}
           />
         </section>

@@ -16,13 +16,15 @@ import {
 type CouponCardProps = {
   coupon: Coupon;
   index: number;
-  isFavorite: boolean;
+  favorites: Set<number>;
   onToggleFavorite: (id: number) => void;
 };
 
-const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardProps) => {
+const CouponCard = ({ coupon, index, favorites, onToggleFavorite }: CouponCardProps) => {
   const [copied, setCopied] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const isFavorite = favorites.has(coupon.coupon_code);
 
   const handleToggleFavorite = () => {
     onToggleFavorite(coupon.coupon_code);
@@ -53,7 +55,7 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
       <Card
         className="group relative flex h-full flex-col overflow-hidden border-border/60 bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
         style={{
-          animationDelay: `${index * 50}ms`,
+          animationDelay: index < 20 ? `${index * 50}ms` : '0ms',
         }}
       >
         {/* Discount badge - only show when original_price > 0 */}
@@ -162,94 +164,96 @@ const CouponCard = ({ coupon, index, isFavorite, onToggleFavorite }: CouponCardP
         </div>
       </Card>
 
-      {/* Options Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">{coupon.coupon_code}-{coupon.name}</DialogTitle>
-            <DialogDescription asChild>
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-2xl font-black text-gradient">${coupon.price}</span>
-                <span className="text-sm text-muted-foreground line-through">原價 ${coupon.original_price}</span>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
+      {/* Options Dialog - lazy rendered */}
+      {isDialogOpen && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold">{coupon.coupon_code}-{coupon.name}</DialogTitle>
+              <DialogDescription asChild>
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-2xl font-black text-gradient">${coupon.price}</span>
+                  <span className="text-sm text-muted-foreground line-through">原價 ${coupon.original_price}</span>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
 
-          {/* Order button at top */}
-          <div className="mt-4">
-            <Button
-              variant="hero"
-              className="w-full"
-              asChild
-            >
-              <a
-                href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2"
+            {/* Order button at top */}
+            <div className="mt-4">
+              <Button
+                variant="hero"
+                className="w-full"
+                asChild
               >
-                <span>前往點餐</span>
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </Button>
-          </div>
-
-          <div className="mt-4 space-y-4">
-            {/* Price reminder */}
-            <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
-              <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
-                💡 品項價格為一件的價錢
-              </p>
+                <a
+                  href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2"
+                >
+                  <span>前往點餐</span>
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
             </div>
 
-            {/* Items with flavors */}
-            <div className="space-y-3">
-              <h4 className="font-semibold text-foreground flex items-center gap-2">
-                <ArrowRightLeft className="h-4 w-4" />
-                可更換口味
-              </h4>
+            <div className="mt-4 space-y-4">
+              {/* Price reminder */}
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3">
+                <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+                  💡 品項價格為一件的價錢
+                </p>
+              </div>
 
-              {!hasAnyFlavors ? (
-                <div className="rounded-lg bg-muted/50 p-4 text-center">
-                  <p className="text-muted-foreground">沒有可以更換的品項</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {coupon.items.map((item, i) => (
-                    <div key={i} className="rounded-lg border border-border p-3">
-                      <p className="font-medium text-foreground mb-2">
-                        {formatItemDisplay(item.name, item.count)}
-                        {item.addition_price > 0 && (
-                          <span className="ml-2 text-sm text-primary">+${item.addition_price}</span>
+              {/* Items with flavors */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-foreground flex items-center gap-2">
+                  <ArrowRightLeft className="h-4 w-4" />
+                  可更換口味
+                </h4>
+
+                {!hasAnyFlavors ? (
+                  <div className="rounded-lg bg-muted/50 p-4 text-center">
+                    <p className="text-muted-foreground">沒有可以更換的品項</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {coupon.items.map((item, i) => (
+                      <div key={i} className="rounded-lg border border-border p-3">
+                        <p className="font-medium text-foreground mb-2">
+                          {formatItemDisplay(item.name, item.count)}
+                          {item.addition_price > 0 && (
+                            <span className="ml-2 text-sm text-primary">+${item.addition_price}</span>
+                          )}
+                        </p>
+                        {item.flavors && item.flavors.length > 0 ? (
+                          <div className="space-y-1.5">
+                            {item.flavors.map((flavor, j) => (
+                              <div
+                                key={j}
+                                className="flex items-center justify-between text-sm bg-secondary/50 rounded-md px-3 py-1.5"
+                              >
+                                <span className="text-secondary-foreground">
+                                  → {flavor.name}
+                                </span>
+                                <span className={`font-medium ${flavor.addition_price === 0 ? 'text-green-600' : 'text-primary'}`}>
+                                  {flavor.addition_price === 0 ? '免費' : `+$${flavor.addition_price}`}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">無可更換選項</p>
                         )}
-                      </p>
-                      {item.flavors && item.flavors.length > 0 ? (
-                        <div className="space-y-1.5">
-                          {item.flavors.map((flavor, j) => (
-                            <div
-                              key={j}
-                              className="flex items-center justify-between text-sm bg-secondary/50 rounded-md px-3 py-1.5"
-                            >
-                              <span className="text-secondary-foreground">
-                                → {flavor.name}
-                              </span>
-                              <span className={`font-medium ${flavor.addition_price === 0 ? 'text-green-600' : 'text-primary'}`}>
-                                {flavor.addition_price === 0 ? '免費' : `+$${flavor.addition_price}`}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">無可更換選項</p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };
