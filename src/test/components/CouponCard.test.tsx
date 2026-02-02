@@ -1,0 +1,161 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import CouponCard from "@/components/CouponCard";
+import type { Coupon } from "@/data/coupons";
+
+// Mock sonner toast
+vi.mock("sonner", () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
+describe("CouponCard", () => {
+  const mockCoupon: Coupon = {
+    name: "超值雙人餐",
+    product_code: "MEAL001",
+    coupon_code: 12345,
+    items: [
+      { name: "原味雞", count: 2, addition_price: 0, flavors: [] },
+      { name: "薯條", count: 1, addition_price: 0, flavors: [{ name: "大份", addition_price: 20 }] },
+    ],
+    start_date: "2024-01-01",
+    end_date: "2024-12-31",
+    price: 199,
+    original_price: 250,
+    discount: 8.0,
+  };
+
+  const defaultProps = {
+    coupon: mockCoupon,
+    index: 0,
+    favorites: new Set<number>(),
+    onToggleFavorite: vi.fn(),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe("渲染", () => {
+    it("應該顯示優惠券名稱", () => {
+      render(<CouponCard {...defaultProps} />);
+      expect(screen.getByText("超值雙人餐")).toBeInTheDocument();
+    });
+
+    it("應該顯示優惠價格", () => {
+      render(<CouponCard {...defaultProps} />);
+      expect(screen.getByText("$199")).toBeInTheDocument();
+    });
+
+    it("應該顯示原價", () => {
+      render(<CouponCard {...defaultProps} />);
+      expect(screen.getByText("原價 $250")).toBeInTheDocument();
+    });
+
+    it("應該顯示折扣標籤", () => {
+      render(<CouponCard {...defaultProps} />);
+      expect(screen.getByText("8 折")).toBeInTheDocument();
+    });
+
+    it("應該顯示優惠碼", () => {
+      render(<CouponCard {...defaultProps} />);
+      expect(screen.getByText("12345")).toBeInTheDocument();
+    });
+
+    it("應該顯示有效期限", () => {
+      render(<CouponCard {...defaultProps} />);
+      expect(screen.getByText("2024-01-01 ~ 2024-12-31")).toBeInTheDocument();
+    });
+
+    it("應該顯示品項列表", () => {
+      render(<CouponCard {...defaultProps} />);
+      expect(screen.getByText("原味雞 x 2")).toBeInTheDocument();
+      expect(screen.getByText("薯條")).toBeInTheDocument();
+    });
+  });
+
+  describe("原價為 0 的情況", () => {
+    it("當原價為 0 時不應顯示折扣標籤", () => {
+      const couponWithZeroPrice: Coupon = {
+        ...mockCoupon,
+        original_price: 0,
+      };
+      render(<CouponCard {...defaultProps} coupon={couponWithZeroPrice} />);
+      expect(screen.queryByText(/折$/)).not.toBeInTheDocument();
+    });
+
+    it("當原價為 0 時不應顯示原價", () => {
+      const couponWithZeroPrice: Coupon = {
+        ...mockCoupon,
+        original_price: 0,
+      };
+      render(<CouponCard {...defaultProps} coupon={couponWithZeroPrice} />);
+      expect(screen.queryByText(/原價/)).not.toBeInTheDocument();
+    });
+  });
+
+  describe("收藏功能", () => {
+    it("應該顯示未收藏狀態", () => {
+      render(<CouponCard {...defaultProps} />);
+      const favoriteButton = screen.getByLabelText("加入收藏");
+      expect(favoriteButton).toBeInTheDocument();
+    });
+
+    it("應該顯示已收藏狀態", () => {
+      render(
+        <CouponCard
+          {...defaultProps}
+          favorites={new Set([12345])}
+        />
+      );
+      const favoriteButton = screen.getByLabelText("取消收藏");
+      expect(favoriteButton).toBeInTheDocument();
+    });
+
+    it("點擊收藏按鈕應該呼叫 onToggleFavorite", () => {
+      const onToggleFavorite = vi.fn();
+      render(<CouponCard {...defaultProps} onToggleFavorite={onToggleFavorite} />);
+      
+      fireEvent.click(screen.getByLabelText("加入收藏"));
+      expect(onToggleFavorite).toHaveBeenCalledWith(12345);
+    });
+  });
+
+  describe("複製優惠碼", () => {
+    it("點擊優惠碼應該複製到剪貼簿", async () => {
+      render(<CouponCard {...defaultProps} />);
+      
+      const codeButton = screen.getByText("12345").closest("button");
+      expect(codeButton).toBeInTheDocument();
+      
+      fireEvent.click(codeButton!);
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith("12345");
+    });
+  });
+
+  describe("動畫延遲", () => {
+    it("前 20 個卡片應該有動畫延遲", () => {
+      const { container } = render(<CouponCard {...defaultProps} index={5} />);
+      const card = container.querySelector('[class*="Card"]');
+      expect(card).toHaveStyle({ animationDelay: "250ms" });
+    });
+
+    it("第 20 個以後的卡片不應該有動畫延遲", () => {
+      const { container } = render(<CouponCard {...defaultProps} index={25} />);
+      const card = container.querySelector('[class*="Card"]');
+      expect(card).toHaveStyle({ animationDelay: "0ms" });
+    });
+  });
+
+  describe("對話框", () => {
+    it("點擊查看餐點選項應該開啟對話框", () => {
+      render(<CouponCard {...defaultProps} />);
+      
+      fireEvent.click(screen.getByText("查看餐點選項"));
+      
+      expect(screen.getByRole("dialog")).toBeInTheDocument();
+    });
+  });
+});
