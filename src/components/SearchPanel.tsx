@@ -50,7 +50,7 @@ const SearchPanel = ({
         {/* Search row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           {/* Search input */}
-          <div className="relative flex-1">
+          <div data-tour="search" className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
@@ -85,7 +85,9 @@ const SearchPanel = ({
           </div>
 
           {/* Sort select */}
-          <SortSelect value={sortBy} onChange={onSortChange} />
+          <div data-tour="sort">
+            <SortSelect value={sortBy} onChange={onSortChange} />
+          </div>
         </div>
 
         {/* Filters row */}
@@ -94,7 +96,7 @@ const SearchPanel = ({
           
           <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {/* Favorites filter */}
-            <div className="flex shrink-0 items-center gap-1">
+            <div data-tour="favorites" className="flex shrink-0 items-center gap-1">
               <button
                 onClick={onToggleFavorites}
                 className={cn(
@@ -135,6 +137,7 @@ const SearchPanel = ({
             <div className="h-5 w-px bg-border shrink-0" />
 
             {/* Item filters */}
+            <div data-tour="filters" className="flex items-center gap-2">
             {itemFilters.map((filter) => {
               const isActive = activeFilters.includes(filter.id);
               return (
@@ -153,6 +156,7 @@ const SearchPanel = ({
                 </button>
               );
             })}
+            </div>
           </div>
 
           {/* Clear filters button */}

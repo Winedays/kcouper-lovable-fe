@@ -8,6 +8,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { type SortOption } from "@/components/SortSelect";
 import { useCoupons } from "@/hooks/useCoupons";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useTour } from "@/hooks/useTour";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,7 @@ const Index = () => {
   const [searchAllOptions, setSearchAllOptions] = useState(false);
   
   const { coupons, count: couponCount, lastUpdate, isLoading, error } = useCoupons();
+  const { startTour, shouldShowTour } = useTour();
   const { 
     favorites, 
     toggleFavorite, 
@@ -43,6 +45,15 @@ const Index = () => {
       cleanupInvalidFavorites(validCodes);
     }
   }, [coupons, cleanupInvalidFavorites]);
+
+  // Auto-start tour for first-time visitors
+  useEffect(() => {
+    if (!isLoading && coupons.length > 0 && shouldShowTour()) {
+      // Delay to ensure DOM is fully rendered
+      const timer = setTimeout(startTour, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, coupons.length, shouldShowTour, startTour]);
 
   const handleFilterToggle = useCallback((filter: ItemFilterId) => {
     setActiveFilters((prev) =>
