@@ -18,9 +18,10 @@ type CouponCardProps = {
   index: number;
   favorites: Set<number>;
   onToggleFavorite: (id: number) => void;
+  isFirstCard?: boolean;
 };
 
-const CouponCard = ({ coupon, index, favorites, onToggleFavorite }: CouponCardProps) => {
+const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = false }: CouponCardProps) => {
   const [copied, setCopied] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -53,6 +54,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite }: CouponCardPr
   return (
     <>
       <Card
+        data-tour={isFirstCard ? "coupon-card" : undefined}
         className="group relative flex h-full flex-col overflow-hidden border-border/60 bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
         style={{
           animationDelay: index < 20 ? `${index * 50}ms` : '0ms',

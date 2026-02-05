@@ -1,5 +1,6 @@
 import { Github, Mail, FileText, Clock, ArrowRightLeft } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import TourButton from "./TourButton";
 
 type HeaderProps = {
   lastUpdate?: string;
@@ -61,7 +62,10 @@ const Header = ({ lastUpdate }: HeaderProps) => {
             <Github className="h-4 w-4" />
             <span className="hidden sm:inline">GitHub</span>
           </a>
-          <ThemeToggle />
+          <TourButton />
+          <div data-tour="theme-toggle">
+            <ThemeToggle />
+          </div>
         </nav>
       </div>
     </header>

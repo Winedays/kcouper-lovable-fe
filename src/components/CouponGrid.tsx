@@ -46,6 +46,7 @@ const CouponGrid = ({ coupons, favorites, onToggleFavorite }: CouponGridProps) =
             index={index}
             favorites={favorites}
             onToggleFavorite={onToggleFavorite}
+            isFirstCard={index === 0}
           />
         ))}
         
