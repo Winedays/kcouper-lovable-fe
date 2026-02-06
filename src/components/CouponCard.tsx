@@ -171,7 +171,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold">{coupon.coupon_code}-{coupon.name}</DialogTitle>
+              <DialogTitle className="text-xl font-bold">{coupon.name}</DialogTitle>
               <DialogDescription asChild>
                 <div className="flex items-center justify-between pt-2">
                   <span className="text-2xl font-black text-gradient">${coupon.price}</span>
