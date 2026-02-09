@@ -260,4 +260,12 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
   );
 };
 
-export default memo(CouponCard);
+export default memo(CouponCard, (prev, next) => {
+  return (
+    prev.coupon.coupon_code === next.coupon.coupon_code &&
+    prev.index === next.index &&
+    prev.isFirstCard === next.isFirstCard &&
+    prev.favorites.has(prev.coupon.coupon_code) === next.favorites.has(next.coupon.coupon_code) &&
+    prev.onToggleFavorite === next.onToggleFavorite
+  );
+});

@@ -8,7 +8,7 @@ export const useFavorites = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? new Set(JSON.parse(stored)) : new Set();
   });
-  
+
   const [removedCoupons, setRemovedCoupons] = useState<number[]>([]);
   const hasCleanedRef = useRef(false);
 
@@ -45,28 +45,27 @@ export const useFavorites = () => {
   const cleanupInvalidFavorites = useCallback((validCouponCodes: Set<number>) => {
     if (hasCleanedRef.current) return [];
     hasCleanedRef.current = true;
-    
+
+    // Calculate invalid codes outside of setState
+    const currentFavorites = favorites;
     const invalidCodes: number[] = [];
-    
-    setFavorites((prev) => {
-      const newFavorites = new Set<number>();
-      prev.forEach((code) => {
-        if (validCouponCodes.has(code)) {
-          newFavorites.add(code);
-        } else {
-          invalidCodes.push(code);
-        }
-      });
-      
-      if (invalidCodes.length > 0) {
-        setRemovedCoupons(invalidCodes);
+    const newFavorites = new Set<number>();
+
+    currentFavorites.forEach((code) => {
+      if (validCouponCodes.has(code)) {
+        newFavorites.add(code);
+      } else {
+        invalidCodes.push(code);
       }
-      
-      return newFavorites;
     });
-    
+
+    if (invalidCodes.length > 0) {
+      setFavorites(newFavorites);
+      setRemovedCoupons(invalidCodes);
+    }
+
     return invalidCodes;
-  }, []);
+  }, [favorites]);
 
   const clearRemovedCoupons = useCallback(() => {
     setRemovedCoupons([]);
