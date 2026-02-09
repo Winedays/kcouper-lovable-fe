@@ -35,6 +35,9 @@ describe("useCoupons", () => {
     delete (window as any).COUPON_DICT;
     delete (window as any).SINGLE_DICT;
     
+    // Store original createElement before spying
+    const originalCreateElement = document.createElement.bind(document);
+    
     // Mock document.createElement for script loading
     vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
       if (tagName === "script") {
@@ -58,7 +61,7 @@ describe("useCoupons", () => {
         
         return script as any;
       }
-      return document.createElement(tagName);
+      return originalCreateElement(tagName);
     });
 
     vi.spyOn(document.head, "appendChild").mockImplementation(() => null as any);
