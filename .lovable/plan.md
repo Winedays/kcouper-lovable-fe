@@ -1,66 +1,77 @@
 
-# 優惠券載入效能優化計畫
 
-## 問題描述
+# 系統架構優化計劃（不含 SEO）
 
-當頁面有 900+ 張優惠券時，從篩選結果（例如 0 張）切換回全部時會明顯卡頓。
+## 概述
+根據先前的架構審查，實施以下 6 項優化，排除 SEO meta 資訊的修改。
 
-## 效能瓶頸分析
+---
 
-| 問題 | 現況 | 影響程度 |
-|------|------|----------|
-| 動畫延遲累積 | `index * 50ms`，第 900 張需等 45 秒 | 高 |
-| DOM 節點過多 | 一次渲染 900+ 張卡片 + 900 個 Dialog | 高 |
-| memo 失效 | `isFavorite` 函數參考不穩定 | 中 |
+## 1. 移除未使用的程式碼
 
-## 優化方案
+- **重構 `src/components/ItemFilter.tsx`**：移除未使用的 React 元件函式及相關 import（`cn`, `X`, `Heart`），只保留資料匯出（`filterMatchRules`、`itemFilters`、`ItemFilterId`）
+- **刪除 `src/components/NavLink.tsx`**：未被任何檔案引用
 
-分成兩個階段，由簡到複雜：
+---
 
-### 第一階段：快速優化（效果顯著）
+## 2. 抽取篩選/排序邏輯
 
-#### 1. 限制動畫延遲
-只對前 20 張卡片套用交錯動畫，其餘直接顯示。
+**新增 `src/hooks/useCouponFilters.ts`**：
+- 封裝 `searchQuery`、`activeFilters`、`showFavoritesOnly`、`sortBy`、`searchAllOptions` 等狀態
+- 封裝 `filteredAndSortedCoupons` 的 `useMemo` 邏輯
+- 封裝 `handleFilterToggle`、`handleClearFilters`、`handleToggleFavorites` 等 callback
+- 接收 `coupons` 和 `favorites` 作為參數
 
-```text
-現況：animationDelay = index * 50ms（第 900 張 = 45 秒）
-優化：index < 20 ? index * 50ms : 0ms
-```
+**修改 `src/pages/Index.tsx`**：
+- 改用 `useCouponFilters` hook，移除內嵌的篩選排序邏輯
+- 預計減少約 40% 程式碼量
 
-#### 2. Dialog 延遲渲染
-只在使用者點擊「查看餐點選項」時才渲染 Dialog 元件。
+---
 
-```text
-現況：每張卡片都預先渲染 Dialog
-優化：{isDialogOpen && <Dialog>...</Dialog>}
-```
+## 3. 修正收藏清理邏輯
 
-#### 3. 穩定化函數參考
-將 `isFavorite` 傳入方式改為穩定參考，讓 `memo` 正常運作。
+**修改 `src/hooks/useFavorites.ts`**：
+- 將 `cleanupInvalidFavorites` 中的 `invalidCodes` 計算移到 `setFavorites` 外部
+- 先從當前 `favorites` 計算差異，再分別呼叫 `setFavorites` 和 `setRemovedCoupons`，避免在 setState updater 內觸發另一個 setState
 
-```text
-現況：isFavorite={isFavorite(coupon.coupon_code)} // 每次都是新的布林值計算
-優化：傳入 favorites Set，讓子元件自行判斷
-```
+---
 
-### 第二階段：漸進式載入 ✅ 已完成
+## 4. ScrollToTop 事件節流
 
-- ✅ 初始顯示 30 張卡片
-- ✅ 使用 IntersectionObserver 偵測滾動
-- ✅ 每次載入更多 30 張
-- ✅ 顯示 Skeleton 載入骨架
+**修改 `src/components/ScrollToTop.tsx`**：
+- `addEventListener` 加入 `{ passive: true }`
+- 使用 `requestAnimationFrame` 節流，避免滾動時頻繁觸發 setState
 
-## 修改檔案
+---
 
-| 檔案 | 修改內容 |
-|------|----------|
-| `src/components/CouponCard.tsx` | 限制動畫延遲、延遲渲染 Dialog |
-| `src/components/CouponGrid.tsx` | 調整 props 傳遞方式 |
+## 5. CouponCard memo 自訂比較
 
-## 預期效果
+**修改 `src/components/CouponCard.tsx`**：
+- 為 `memo` 加入自訂比較函式
+- 比較 `coupon.coupon_code`、`index`、`isFirstCard`、以及 `favorites.has(coupon.coupon_code)` 的結果
+- 避免因 `favorites` Set 參考改變導致所有卡片重新渲染
 
-| 指標 | 優化前 | 優化後 |
-|------|--------|--------|
-| 動畫計時器數量 | 900 個 | 20 個 |
-| Dialog 元件數量 | 900 個 | 0-1 個 |
-| 切換篩選響應 | 1-3 秒延遲 | 接近即時 |
+---
+
+## 6. 無障礙性改進
+
+**修改 `src/components/SearchPanel.tsx`**：
+- 篩選按鈕加入 `aria-pressed={isActive}`
+- 搜尋 input 加入 `aria-label="搜尋優惠券"`
+- 清除按鈕加入 `aria-label="清除搜尋"`
+
+---
+
+## 檔案變更總覽
+
+| 操作 | 檔案 | 說明 |
+|------|------|------|
+| 重構 | `src/components/ItemFilter.tsx` | 移除未使用的元件，只保留資料匯出 |
+| 刪除 | `src/components/NavLink.tsx` | 未使用的元件 |
+| 新增 | `src/hooks/useCouponFilters.ts` | 抽取篩選/排序邏輯 |
+| 修改 | `src/pages/Index.tsx` | 簡化為使用 useCouponFilters |
+| 修改 | `src/hooks/useFavorites.ts` | 修正 setState 巢狀呼叫 |
+| 修改 | `src/components/ScrollToTop.tsx` | 加入 scroll 事件節流 |
+| 修改 | `src/components/CouponCard.tsx` | 加入自訂 memo 比較函式 |
+| 修改 | `src/components/SearchPanel.tsx` | 改善無障礙性 |
+
