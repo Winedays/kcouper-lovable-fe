@@ -58,11 +58,13 @@ const SearchPanel = ({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="h-10 bg-secondary/50 pl-9 pr-4 text-sm"
+              aria-label="搜尋優惠券"
             />
             {searchQuery && (
               <button
                 onClick={() => onSearchChange("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                aria-label="清除搜尋"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -99,6 +101,7 @@ const SearchPanel = ({
             <div data-tour="favorites" className="flex shrink-0 items-center gap-1">
               <button
                 onClick={onToggleFavorites}
+                aria-pressed={showFavoritesOnly}
                 className={cn(
                   "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
                   showFavoritesOnly
@@ -144,6 +147,7 @@ const SearchPanel = ({
                 <button
                   key={filter.id}
                   onClick={() => onFilterToggle(filter.id)}
+                  aria-pressed={isActive}
                   className={cn(
                     "inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
                     isActive
