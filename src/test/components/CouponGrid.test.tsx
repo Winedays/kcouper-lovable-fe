@@ -69,7 +69,7 @@ describe("CouponGrid", () => {
       const { container } = render(<CouponGrid {...defaultProps} coupons={manyCoupons} />);
       
       // 應該有 skeleton 元素
-      const skeletons = container.querySelectorAll('[class*="skeleton"]');
+      const skeletons = container.querySelectorAll('[class*="animate-pulse"]');
       expect(skeletons.length).toBeGreaterThan(0);
     });
 

@@ -139,14 +139,17 @@ describe("CouponCard", () => {
   describe("動畫延遲", () => {
     it("前 20 個卡片應該有動畫延遲", () => {
       const { container } = render(<CouponCard {...defaultProps} index={5} />);
-      const card = container.querySelector('[class*="Card"]');
-      expect(card).toHaveStyle({ animationDelay: "250ms" });
+      // Card is the first DOM element (Fragment doesn't render), style is on the Card element
+      const card = container.firstElementChild as HTMLElement;
+      expect(card).not.toBeNull();
+      expect(card.style.animationDelay).toBe("250ms");
     });
 
     it("第 20 個以後的卡片不應該有動畫延遲", () => {
       const { container } = render(<CouponCard {...defaultProps} index={25} />);
-      const card = container.querySelector('[class*="Card"]');
-      expect(card).toHaveStyle({ animationDelay: "0ms" });
+      const card = container.firstElementChild as HTMLElement;
+      expect(card).not.toBeNull();
+      expect(card.style.animationDelay).toBe("0ms");
     });
   });
 
