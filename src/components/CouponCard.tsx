@@ -1,5 +1,4 @@
 import { type Coupon } from "@/data/coupons";
-import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart } from "lucide-react";
@@ -107,15 +106,10 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             )}
           </div>
 
-          {/* Code and validity */}
-          <div className="flex items-center justify-between">
-            <Badge variant="secondary" className="font-mono text-sm">
-              {coupon.coupon_code}
-            </Badge>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5" />
-              <span>{coupon.start_date} ~ {coupon.end_date}</span>
-            </div>
+          {/* Validity */}
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" />
+            <span>{coupon.start_date} ~ {coupon.end_date}</span>
           </div>
 
           {/* Action buttons */}
