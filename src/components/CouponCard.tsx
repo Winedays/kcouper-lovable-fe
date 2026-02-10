@@ -2,7 +2,7 @@ import { type Coupon } from "@/data/coupons";
 import { Badge } from "./ui/badge";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Copy, Check, Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart } from "lucide-react";
+import { Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart } from "lucide-react";
 import { useState, memo } from "react";
 import { toast } from "sonner";
 import {
@@ -22,7 +22,6 @@ type CouponCardProps = {
 };
 
 const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = false }: CouponCardProps) => {
-  const [copied, setCopied] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const isFavorite = favorites.has(coupon.coupon_code);
@@ -30,13 +29,6 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
   const handleToggleFavorite = () => {
     onToggleFavorite(coupon.coupon_code);
     toast.success(isFavorite ? "已取消收藏" : "已加入收藏");
-  };
-
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(coupon.coupon_code.toString());
-    setCopied(true);
-    toast.success("優惠碼已複製！");
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const savings = coupon.original_price - coupon.price;
@@ -117,17 +109,9 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
 
           {/* Code and validity */}
           <div className="flex items-center justify-between">
-            <button
-              onClick={handleCopyCode}
-              className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-sm font-mono font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
-            >
-              {copied ? (
-                <Check className="h-3.5 w-3.5 text-green-600" />
-              ) : (
-                <Copy className="h-3.5 w-3.5" />
-              )}
-              <span>{coupon.coupon_code}</span>
-            </button>
+            <Badge variant="secondary" className="font-mono text-sm">
+              {coupon.coupon_code}
+            </Badge>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Calendar className="h-3.5 w-3.5" />
               <span>{coupon.start_date} ~ {coupon.end_date}</span>
