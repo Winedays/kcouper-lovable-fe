@@ -91,25 +91,20 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
           {/* Spacer to push bottom content */}
           <div className="flex-1" />
 
-          {/* Price section */}
-          <div className="mb-4 flex items-end justify-between border-t border-border/50 pt-4">
-            <p className="text-2xl font-black text-gradient">
+          {/* Price & validity row */}
+          <div className="flex items-center gap-3 border-t border-border/50 pt-4">
+            <p className="text-xl font-black text-gradient">
               ${coupon.price}
             </p>
-            {/* Only show original price when > 0 */}
             {coupon.original_price > 0 && (
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground line-through">
-                  原價 ${coupon.original_price}
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground line-through">
+                原價 ${coupon.original_price}
+              </p>
             )}
-          </div>
-
-          {/* Validity */}
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5" />
-            <span>{coupon.start_date} ~ {coupon.end_date}</span>
+            <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
+              <Calendar className="h-3.5 w-3.5" />
+              <span>{coupon.start_date} ~ {coupon.end_date}</span>
+            </div>
           </div>
 
           {/* Action buttons */}

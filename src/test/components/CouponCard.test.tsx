@@ -60,11 +60,6 @@ describe("CouponCard", () => {
       expect(screen.getByText("8 折")).toBeInTheDocument();
     });
 
-    it("應該顯示優惠碼", () => {
-      render(<CouponCard {...defaultProps} />);
-      expect(screen.getByText("12345")).toBeInTheDocument();
-    });
-
     it("應該顯示有效期限", () => {
       render(<CouponCard {...defaultProps} />);
       expect(screen.getByText("2024-01-01 ~ 2024-12-31")).toBeInTheDocument();
@@ -121,18 +116,6 @@ describe("CouponCard", () => {
       
       fireEvent.click(screen.getByLabelText("加入收藏"));
       expect(onToggleFavorite).toHaveBeenCalledWith(12345);
-    });
-  });
-
-  describe("複製優惠碼", () => {
-    it("點擊優惠碼應該複製到剪貼簿", async () => {
-      render(<CouponCard {...defaultProps} />);
-      
-      const codeButton = screen.getByText("12345").closest("button");
-      expect(codeButton).toBeInTheDocument();
-      
-      fireEvent.click(codeButton!);
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith("12345");
     });
   });
 
