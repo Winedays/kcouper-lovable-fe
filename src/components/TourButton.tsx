@@ -5,7 +5,11 @@ import { useTour } from "@/hooks/useTour";
  * Button component to manually trigger the site tour
  * Placed in the header for easy access
  */
-const TourButton = () => {
+type TourButtonProps = {
+  showLabel?: boolean;
+};
+
+const TourButton = ({ showLabel = false }: TourButtonProps) => {
   const { startTour } = useTour();
 
   return (
@@ -16,7 +20,7 @@ const TourButton = () => {
       title="查看網站導覽"
     >
       <HelpCircle className="h-4 w-4" />
-      <span className="hidden sm:inline">導覽</span>
+      <span className={showLabel ? "" : "hidden sm:inline"}>導覽</span>
     </button>
   );
 };

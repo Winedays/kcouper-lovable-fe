@@ -122,10 +122,10 @@ const Header = ({ lastUpdate }: HeaderProps) => {
                     <span>{item.label}</span>
                   </a>
                 ))}
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
-                  <TourButton />
+                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-foreground transition-colors hover:bg-muted">
+                  <TourButton showLabel />
                 </div>
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" data-tour="theme-toggle">
+                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-foreground transition-colors hover:bg-muted" data-tour="theme-toggle">
                   <ThemeToggle />
                   <span className="text-sm">主題切換</span>
                 </div>
