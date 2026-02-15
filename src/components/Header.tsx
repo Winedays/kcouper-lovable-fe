@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Github, Mail, FileText, Clock, ArrowRightLeft, Menu } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import TourButton from "./TourButton";
@@ -74,19 +74,20 @@ const Header = ({ lastUpdate }: HeaderProps) => {
               <span>{lastUpdate}</span>
             </div>
           )}
-          {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-              title={item.label}
-              {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </a>
+          {navItems.map((item, index) => (
+            <React.Fragment key={item.label}>
+              <a
+                href={item.href}
+                className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                title={item.label}
+                {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </a>
+              {index === 0 && <AnnouncementButton />}
+            </React.Fragment>
           ))}
-          <AnnouncementButton />
           <TourButton />
           <div data-tour="theme-toggle">
             <ThemeToggle />
@@ -112,19 +113,20 @@ const Header = ({ lastUpdate }: HeaderProps) => {
                 <SheetTitle className="text-left">選單</SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 mt-4">
-                {navItems.map((item) => (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-muted"
-                    onClick={() => setOpen(false)}
-                    {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                  >
-                    {item.icon}
-                    <span>{item.label}</span>
-                  </a>
+                {navItems.map((item, index) => (
+                  <React.Fragment key={item.label}>
+                    <a
+                      href={item.href}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-muted"
+                      onClick={() => setOpen(false)}
+                      {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    >
+                      {item.icon}
+                      <span>{item.label}</span>
+                    </a>
+                    {index === 0 && <AnnouncementButton variant="menu-item" />}
+                  </React.Fragment>
                 ))}
-                <AnnouncementButton variant="menu-item" />
                 <TourButton showLabel variant="menu-item" onBeforeStart={() => setOpen(false)} />
                 <div data-tour="theme-toggle">
                   <ThemeToggle variant="menu-item" label="主題切換" />
