@@ -3,11 +3,17 @@ import { driver, type DriveStep } from "driver.js";
 import "driver.js/dist/driver.css";
 
 const TOUR_COMPLETED_KEY = "kcouper-tour-completed";
+const MOBILE_BREAKPOINT = 768;
+
+/**
+ * Check if the current viewport is mobile
+ */
+const isMobileViewport = () => window.innerWidth < MOBILE_BREAKPOINT;
 
 /**
  * Tour steps configuration for the walkthrough
  */
-const tourSteps: DriveStep[] = [
+const getBaseTourSteps = (): DriveStep[] => [
   {
     element: "[data-tour='hero']",
     popover: {
@@ -62,15 +68,6 @@ const tourSteps: DriveStep[] = [
       align: "center",
     },
   },
-  {
-    element: "[data-tour='theme-toggle']",
-    popover: {
-      title: "主題切換",
-      description: "可切換淺色、深色或自動模式，保護你的眼睛 👀",
-      side: "left",
-      align: "center",
-    },
-  },
 ];
 
 /**
@@ -82,9 +79,35 @@ export const useTour = () => {
    * Start the tour walkthrough
    */
   const startTour = useCallback(() => {
+    const mobile = isMobileViewport();
+    const steps: DriveStep[] = [...getBaseTourSteps()];
+
+    if (mobile) {
+      // On mobile, guide user to the hamburger menu, then highlight theme toggle inside the sheet
+      steps.push({
+        element: "[data-tour='theme-toggle']",
+        popover: {
+          title: "主題切換",
+          description: "點擊右上角的選單按鈕 ☰，即可找到主題切換、導覽等更多功能 👀",
+          side: "bottom",
+          align: "end",
+        },
+      });
+    } else {
+      steps.push({
+        element: "[data-tour='theme-toggle']",
+        popover: {
+          title: "主題切換",
+          description: "可切換淺色、深色或自動模式，保護你的眼睛 👀",
+          side: "left",
+          align: "center",
+        },
+      });
+    }
+
     const driverObj = driver({
       showProgress: true,
-      steps: tourSteps,
+      steps,
       nextBtnText: "下一步",
       prevBtnText: "上一步",
       doneBtnText: "完成",
@@ -93,7 +116,6 @@ export const useTour = () => {
       overlayColor: "rgba(0, 0, 0, 0.75)",
       popoverClass: "kcouper-tour-popover",
       onDestroyStarted: () => {
-        // Mark tour as completed when user finishes or skips
         localStorage.setItem(TOUR_COMPLETED_KEY, "true");
         driverObj.destroy();
       },
