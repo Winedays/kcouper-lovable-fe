@@ -122,7 +122,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
                     <span>{item.label}</span>
                   </a>
                 ))}
-                <TourButton showLabel variant="menu-item" />
+                <TourButton showLabel variant="menu-item" onBeforeStart={() => setOpen(false)} />
                 <div data-tour="theme-toggle">
                   <ThemeToggle variant="menu-item" label="主題切換" />
                 </div>
