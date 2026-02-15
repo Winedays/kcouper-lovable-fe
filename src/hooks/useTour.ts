@@ -83,14 +83,12 @@ export const useTour = () => {
     const steps: DriveStep[] = [...getBaseTourSteps()];
 
     if (mobile) {
-      // On mobile, guide user to the hamburger menu, then highlight theme toggle inside the sheet
+      // On mobile, the theme toggle is inside the closed Sheet menu,
+      // so show a generic popover without targeting a specific element
       steps.push({
-        element: "[data-tour='theme-toggle']",
         popover: {
           title: "主題切換",
           description: "點擊右上角的選單按鈕 ☰，即可找到主題切換、導覽等更多功能 👀",
-          side: "bottom",
-          align: "end",
         },
       });
     } else {
