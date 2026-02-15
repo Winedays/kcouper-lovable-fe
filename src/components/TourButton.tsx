@@ -1,16 +1,32 @@
 import { HelpCircle } from "lucide-react";
 import { useTour } from "@/hooks/useTour";
 
+type TourButtonProps = {
+  showLabel?: boolean;
+  /** When "menu-item", renders matching mobile nav item styles */
+  variant?: "default" | "menu-item";
+};
+
 /**
  * Button component to manually trigger the site tour
  * Placed in the header for easy access
  */
-type TourButtonProps = {
-  showLabel?: boolean;
-};
-
-const TourButton = ({ showLabel = false }: TourButtonProps) => {
+const TourButton = ({ showLabel = false, variant = "default" }: TourButtonProps) => {
   const { startTour } = useTour();
+
+  if (variant === "menu-item") {
+    return (
+      <button
+        onClick={startTour}
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-muted"
+        aria-label="網站導覽"
+        title="查看網站導覽"
+      >
+        <HelpCircle className="h-4 w-4" />
+        <span>導覽</span>
+      </button>
+    );
+  }
 
   return (
     <button
