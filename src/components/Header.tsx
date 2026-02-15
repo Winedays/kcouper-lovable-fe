@@ -125,9 +125,8 @@ const Header = ({ lastUpdate }: HeaderProps) => {
                 <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-foreground transition-colors hover:bg-muted">
                   <TourButton showLabel />
                 </div>
-                <div className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-foreground transition-colors hover:bg-muted" data-tour="theme-toggle">
-                  <ThemeToggle />
-                  <span className="text-sm">主題切換</span>
+                <div data-tour="theme-toggle">
+                  <ThemeToggle variant="menu-item" label="主題切換" />
                 </div>
               </nav>
             </SheetContent>
