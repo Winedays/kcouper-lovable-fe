@@ -209,6 +209,7 @@
 .driver-popover-close-btn-text {
   background-image: var(--gradient-primary) !important;
   color: hsl(var(--primary-foreground)) !important;
+  text-shadow: none !important;
 }
 
 .driver-popover-next-btn:hover {
