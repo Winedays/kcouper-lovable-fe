@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Github, Mail, FileText, Clock, ArrowRightLeft, Menu } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import TourButton from "./TourButton";
+import AnnouncementButton from "./AnnouncementButton";
 import {
   Sheet,
   SheetContent,
@@ -85,6 +86,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
               <span>{item.label}</span>
             </a>
           ))}
+          <AnnouncementButton />
           <TourButton />
           <div data-tour="theme-toggle">
             <ThemeToggle />
@@ -122,6 +124,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
                     <span>{item.label}</span>
                   </a>
                 ))}
+                <AnnouncementButton variant="menu-item" />
                 <TourButton showLabel variant="menu-item" onBeforeStart={() => setOpen(false)} />
                 <div data-tour="theme-toggle">
                   <ThemeToggle variant="menu-item" label="主題切換" />
