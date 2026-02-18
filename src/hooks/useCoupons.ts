@@ -2,6 +2,33 @@ import { useState, useEffect } from "react";
 import type { Coupon, CouponDict, SingleDict } from "@/data/coupons";
 
 /**
+ * Mapping of various item name variations to a standard name for price lookup
+ */
+const SINGLE_PRODUCT_NICKNAME = {
+    '原味蛋撻': '原味蛋撻-超極酥',
+    '原味蛋撻超極酥': '原味蛋撻-超極酥',
+    '原蛋': '原味蛋撻-超極酥',
+    '雞塊': '上校雞塊',
+    '4雞塊': '上校雞塊4塊',
+    '8雞塊': '上校雞塊8塊',
+    '冰檸檬紅茶(小)': '立頓檸檬風味紅茶(小)',
+    '冰檸檬紅茶(中)': '立頓檸檬風味紅茶(中)',
+    '無糖綠茶(小)': '冰無糖綠茶(小)',
+    '無糖綠茶(中)': '冰無糖綠茶(中)',
+    '青花椒香麻咔啦雞腿堡': '青花椒咔啦雞腿堡',
+    '魚圈圈': '鱈魚圈圈',
+    '薯條(小)': '香酥脆薯(小)',
+    '小薯': '香酥脆薯(小)',
+    '薯條(中)': '香酥脆薯(中)',
+    '中薯': '香酥脆薯(中)',
+    '薯條(大)': '香酥脆薯(大)',
+    '大薯': '香酥脆薯(大)',
+    '黃金超蝦塊': '黃金超蝦塊3塊',
+    '蘋果汁': '100%蘋果汁',
+    '黃金魚子海陸堡': '黃金魚子海陸Q蝦堡',
+}
+
+/**
  * Items to exclude from original price calculation
  */
 const EXCLUDE_ITEMS = [
@@ -12,6 +39,18 @@ const EXCLUDE_ITEMS = [
 ];
 
 const EXCLUDE_ITEMS_REGEX = new RegExp(EXCLUDE_ITEMS.join('|'));
+
+/**
+ * Units to look for in price calculation, e.g. "2塊", "3份"
+ */
+const UNIT_WORD = [
+    '塊',
+    '份',
+    '顆',
+    '入',
+]
+
+const SITE_CASE_FOR_PRICE = new RegExp(`20:00前供應|\\(辣\\)|\\(不辣\\)|[1-9][0-9]*(${UNIT_WORD.join('|')})`, 'g')
 
 /**
  * @typedef {Object} UseCouponsResult
@@ -32,23 +71,65 @@ type UseCouponsResult = {
 };
 
 /**
- * Calculate original price for an item based on SINGLE_DICT
+ * Calculate original price for an item based on singleDict
  * @param {string} name - Item name
  * @param {number} count - Item count
  * @param {SingleDict} singleDict - Single item dictionary
  * @returns {number} Original price for the item
- * @throws {Error} If item not found in SINGLE_DICT
+ * @throws {Error} If item not found in singleDict
  */
 function calculateOriginalPrice(name: string, count: number, singleDict: SingleDict): number {
-  const item = singleDict[name];
-  if (!item) {
-    throw new Error(`Cannot find item: ${name}`);
+  // walk around for 2塊咔啦脆雞
+  if (name === '2塊咔啦脆雞(辣)') {
+      name = '咔啦脆雞';
+      count *= 2;
   }
-  return item.price * count;
+  // walk around for 2入原味蛋撻
+  if (name === '2入原味蛋撻') {
+      name = '原味蛋撻';
+      count *= 2;
+  }
+
+  const renderName = name.replace(SITE_CASE_FOR_PRICE, '').trim();
+  if (renderName === '咔啦脆雞') {
+      const numTwos = Math.floor(count / 2);
+      const numOnes = count % 2;
+      return numTwos * singleDict['咔啦脆雞2塊'].price + numOnes * singleDict['咔啦脆雞'].price;
+  } else if (singleDict[renderName] !== undefined){
+      return singleDict[renderName].price * count;
+  } else if (singleDict[SINGLE_PRODUCT_NICKNAME[renderName]] !== undefined) {
+      return singleDict[SINGLE_PRODUCT_NICKNAME[renderName]].price * count;
+  } else if (name === '上校雞塊') {
+      if (count === 4) {
+          return singleDict['上校雞塊4塊'].price;
+      } else if (count === 8) {
+          return singleDict['上校雞塊8塊'].price;
+      } else if (count === 20) {
+          return singleDict['上校雞塊分享盒(20塊)'].price;
+      }
+      throw new Error('Cannot find item');
+  } else if (name === '上校雞塊4塊' || name === '4塊雞塊' || name === '4塊上校雞塊') {
+      return singleDict['上校雞塊4塊'].price * count;
+  } else if (name === '上校雞塊8塊' || name === '8塊雞塊' || name === '8塊上校雞塊') {
+      return singleDict['上校雞塊8塊'].price * count;
+  } else {
+      // try to split by '+' first
+      const splitNames = name.split('+').map(n => n.trim());
+      let _price = 0;
+      if (splitNames.length > 1) {
+          splitNames.forEach(n => {
+              _price += calculateOriginalPrice(n, count, singleDict);
+          })
+          if (_price > 0) {
+              return _price;
+          }
+      }
+      throw new Error('Cannot find item');
+  }
 }
 
 /**
- * Process coupons to calculate original_price and discount based on SINGLE_DICT
+ * Process coupons to calculate original_price and discount based on singleDict
  * @param {Coupon[]} coupons - Array of coupons to process
  * @param {SingleDict} singleDict - Single item dictionary
  * @returns {Coupon[]} Processed coupons with calculated original_price and discount
@@ -64,6 +145,7 @@ function processCouponsWithPrices(coupons: Coupon[], singleDict: SingleDict): Co
       try {
         originalPrice += calculateOriginalPrice(name, count, singleDict);
       } catch {
+        // console.log(`Cannot find item: ${name} in coupon code: ${coupon.coupon_code}`);
         originalPrice = 0;
         canGetOriginalPrice = false;
       }
@@ -188,7 +270,7 @@ export function useCoupons(): UseCouponsResult {
         }
 
         const couponDict: CouponDict = window.COUPON_DICT;
-        
+
         // If SINGLE_DICT is available, calculate prices; otherwise use original data
         let processedCoupons: Coupon[];
         if (window.SINGLE_DICT) {
