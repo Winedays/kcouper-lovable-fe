@@ -112,7 +112,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 py-3 sm:py-0"
+              className="flex-1 py-2 sm:py-0"
               onClick={() => setIsDialogOpen(true)}
             >
               <ChefHat className="h-4 w-4 mr-2" />
@@ -122,7 +122,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             <Button
               variant="hero"
               size="sm"
-              className="flex-1 py-3 sm:py-0"
+              className="flex-1 py-2 sm:py-0"
               asChild
             >
               <a
