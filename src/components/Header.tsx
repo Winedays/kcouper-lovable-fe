@@ -31,7 +31,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
 
   const navItems: NavItem[] = [
     {
-      href: "/v1/index.html",
+      href: "v1/index.html",
       icon: <ArrowRightLeft className="h-4 w-4" />,
       label: "舊版",
     },
