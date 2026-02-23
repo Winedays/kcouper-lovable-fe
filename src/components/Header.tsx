@@ -3,6 +3,7 @@ import { Github, Mail, FileText, Clock, ArrowRightLeft, Menu } from "lucide-reac
 import ThemeToggle from "./ThemeToggle";
 import TourButton from "./TourButton";
 import AnnouncementButton from "./AnnouncementButton";
+import FaqDialog from "./FaqDialog";
 import {
   Sheet,
   SheetContent,
@@ -88,6 +89,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
               {index === 0 && <AnnouncementButton />}
             </React.Fragment>
           ))}
+          <FaqDialog />
           <TourButton />
           <div data-tour="theme-toggle">
             <ThemeToggle />
@@ -127,6 +129,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
                     {index === 0 && <AnnouncementButton variant="menu-item" />}
                   </React.Fragment>
                 ))}
+                <FaqDialog variant="menu-item" />
                 <TourButton showLabel variant="menu-item" onBeforeStart={() => setOpen(false)} />
                 <div data-tour="theme-toggle">
                   <ThemeToggle variant="menu-item" label="主題切換" />
