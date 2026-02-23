@@ -3,11 +3,14 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import SearchPanel from "@/components/SearchPanel";
 import CouponGrid from "@/components/CouponGrid";
+import CompareBar from "@/components/CompareBar";
+import CompareDialog from "@/components/CompareDialog";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useCoupons } from "@/hooks/useCoupons";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useTour } from "@/hooks/useTour";
 import { useCouponFilters } from "@/hooks/useCouponFilters";
+import { useCompare } from "@/hooks/useCompare";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,6 +47,15 @@ const Index = () => {
     handleToggleFavorites,
     filteredAndSortedCoupons,
   } = useCouponFilters(coupons, favorites);
+
+  const {
+    compareList,
+    compareCount,
+    toggleCompare,
+    clearCompare,
+    isDialogOpen: isCompareDialogOpen,
+    setIsDialogOpen: setCompareDialogOpen,
+  } = useCompare();
 
   // Check for invalid favorites when coupons are loaded
   useEffect(() => {
@@ -119,9 +131,26 @@ const Index = () => {
             coupons={filteredAndSortedCoupons}
             favorites={favorites}
             onToggleFavorite={toggleFavorite}
+            compareList={compareList}
+            onToggleCompare={toggleCompare}
           />
         </section>
       </main>
+
+      <CompareBar
+        compareList={compareList}
+        coupons={filteredAndSortedCoupons}
+        onRemove={toggleCompare}
+        onClear={clearCompare}
+        onCompare={() => setCompareDialogOpen(true)}
+      />
+
+      <CompareDialog
+        open={isCompareDialogOpen}
+        onOpenChange={setCompareDialogOpen}
+        coupons={coupons}
+        compareList={compareList}
+      />
 
       <ScrollToTop />
 
