@@ -152,7 +152,7 @@ const Index = () => {
         compareList={compareList}
       />
 
-      <ScrollToTop />
+      <ScrollToTop offsetBottom={compareCount > 0} />
 
       {/* Invalid favorites removed dialog */}
       <AlertDialog open={removedCoupons.length > 0} onOpenChange={(open) => !open && clearRemovedCoupons()}>
