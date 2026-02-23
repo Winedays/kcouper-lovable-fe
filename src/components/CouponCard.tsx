@@ -121,36 +121,37 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
               查看餐點選項
             </Button>
 
-            <Button
-              variant="hero"
-              size="sm"
-              className="flex-1 py-2 sm:py-0"
-              asChild
-            >
-              <a
-                href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2"
+            {/* Compare button */}
+            {onToggleCompare && (
+              <Button
+                variant={isComparing ? "default" : "outline"}
+                size="sm"
+                className="flex-1 py-2 sm:py-0"
+                onClick={() => onToggleCompare(coupon.coupon_code)}
               >
-                <span>前往點餐</span>
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </Button>
+                <GitCompareArrows className="h-4 w-4 mr-2" />
+                {isComparing ? "已加入比較" : "加入比較"}
+              </Button>
+            )}
           </div>
 
-          {/* Compare button */}
-          {onToggleCompare && (
-            <Button
-              variant={isComparing ? "default" : "outline"}
-              size="sm"
-              className="mt-2 w-full py-3 sm:py-0"
-              onClick={() => onToggleCompare(coupon.coupon_code)}
+          {/* Order button */}
+          <Button
+            variant="hero"
+            size="sm"
+            className="mt-2 w-full py-3 sm:py-0"
+            asChild
+          >
+            <a
+              href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2"
             >
-              <GitCompareArrows className="h-4 w-4 mr-2" />
-              {isComparing ? "已加入比較" : "加入比較"}
-            </Button>
-          )}
+              <span>前往點餐</span>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          </Button>
         </div>
       </Card>
 
