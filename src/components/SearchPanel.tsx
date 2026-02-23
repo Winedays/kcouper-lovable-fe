@@ -222,13 +222,13 @@ const SearchPanel = ({
                     )}
                   </button>
                   {isActive && (
-                    <div className="inline-flex items-center rounded-r-full bg-primary/90 text-primary-foreground">
+                    <div className="inline-flex items-center self-stretch rounded-r-full bg-primary/90 text-primary-foreground">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onFilterCountChange(filter.id, -1);
                         }}
-                        className="flex h-[30px] w-6 items-center justify-center hover:bg-primary-foreground/10 transition-colors"
+                        className="flex w-6 items-center justify-center self-stretch hover:bg-primary-foreground/10 transition-colors"
                         aria-label={`減少${filter.label}數量`}
                       >
                         <Minus className="h-3 w-3" />
@@ -239,7 +239,7 @@ const SearchPanel = ({
                           e.stopPropagation();
                           onFilterCountChange(filter.id, 1);
                         }}
-                        className="flex h-[30px] w-6 items-center justify-center rounded-r-full hover:bg-primary-foreground/10 transition-colors"
+                        className="flex w-6 items-center justify-center self-stretch rounded-r-full hover:bg-primary-foreground/10 transition-colors"
                         aria-label={`增加${filter.label}數量`}
                       >
                         <Plus className="h-3 w-3" />
