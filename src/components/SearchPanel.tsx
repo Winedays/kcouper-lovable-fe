@@ -148,7 +148,7 @@ const SearchPanel = ({
           </div>
         </div>
 
-        {/* Filters row */}
+        {/* Filters row 1: Favorites + Item filters */}
         <div className="mt-4 flex items-center gap-2">
           <SlidersHorizontal className="h-4 w-4 text-muted-foreground shrink-0" />
           
@@ -217,13 +217,15 @@ const SearchPanel = ({
               );
             })}
             </div>
+          </div>
+        </div>
 
-            {/* Divider */}
-            <div className="h-5 w-px bg-border shrink-0" />
+        {/* Filters row 2: Price range filters */}
+        <div className="mt-2 flex items-center gap-2">
+          <DollarSign className="h-4 w-4 text-muted-foreground shrink-0" />
 
-            {/* Price range filters */}
+          <div className="flex flex-1 items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
             <div data-tour="price-filter" className="flex shrink-0 items-center gap-2">
-              <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               {PRICE_PRESETS.map((preset) => {
                 const active = isPresetActive(priceRange, preset.range, priceStats.max);
                 return (
