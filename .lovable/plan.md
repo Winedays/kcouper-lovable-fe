@@ -1,68 +1,71 @@
 
 
-## 改進品項篩選：加入數量搜尋功能
+## 新增 FAQ 常見問題頁面
 
 ### 概述
 
-在現有的品項篩選按鈕旁邊加入 +/- 數量調整按鈕，讓使用者可以篩選「含有至少 N 個該品項」的優惠券。例如：點擊「蛋撻」後，旁邊出現 -/+ 按鈕，預設為 1，可調整到 2、3 等，代表篩選含有至少 2 個蛋撻的優惠券。
+在網站中加入一個 FAQ（常見問題）區塊，使用手風琴（Accordion）元件展示使用者可能遇到的問題與細節資訊。FAQ 會以一個獨立的對話框（Dialog）呈現，從 Header 的導航列中開啟。
 
-### UI 行為
+### FAQ 內容規劃
 
-- 未啟用的篩選按鈕：顯示如現有的圓角標籤（如 `🥧 蛋撻`）
-- 點擊啟用後：按鈕右側出現 `-` 數字 `+` 控制區，預設數量為 1
-- 點擊 `+` 增加最少數量需求，`-` 減少；當數量減至 0 時自動取消該篩選
-- 數量顯示在按鈕上（如 `🥧 蛋撻 x2`）
+包含以下類別的問題：
+
+**基本使用**
+- 什麼是 KCouper？— 說明網站用途
+- 優惠券多久更新一次？— 說明資料來源與更新頻率
+- 如何使用優惠券？— 到店出示優惠碼的流程
+
+**搜尋與篩選**
+- 如何搜尋特定品項？— 說明搜尋框與品項篩選按鈕的使用方式
+- 品項篩選的數量功能是什麼？— 說明 +/- 數量篩選（新功能）
+- 「搜尋口味」開關是做什麼的？— 說明 searchAllOptions 的功能
+- 如何排序優惠券？— 說明排序選項
+
+**收藏與比較**
+- 如何收藏優惠券？— 說明收藏功能與 localStorage 儲存
+- 收藏的優惠券會保留多久？— 說明過期券會自動移除
+- 如何比較優惠券？— 說明比較功能的操作方式
+
+**其他**
+- 如何分享優惠券給朋友？— 說明分享連結功能
+- 如何切換深色/淺色主題？— 說明主題切換
+- 舊版網站還能用嗎？— 說明 v1 連結
+
+### UI 設計
+
+- 從 Header 加入一個「常見問題」按鈕（使用 `HelpCircle` 圖示）
+- 點擊後開啟一個 Dialog，內容使用 Accordion 元件逐條展開
+- 在手機版的 Sheet 選單中也加入對應的選單項目
+- FAQ 內容集中管理在 `src/data/faq.ts` 資料檔中
 
 ### 技術細節
 
-#### 1. 修改 `useCouponFilters.ts` — 篩選狀態與邏輯
-
-**狀態變更：**
-- 將 `activeFilters` 從 `ItemFilterId[]` 改為 `Record<ItemFilterId, number>`（key 為篩選 ID，value 為最少數量）
-- 修改 `handleFilterToggle` 為可處理數量增減的邏輯
-- 新增 `handleFilterCountChange(filter, delta)` 方法
-
-**篩選邏輯變更：**
-- 現有邏輯：檢查 coupon 的 items 中是否有名稱匹配篩選的品項
-- 新邏輯：檢查匹配品項的 `count` 總和是否 >= 指定數量
+#### 1. 新增 `src/data/faq.ts` — FAQ 資料
 
 ```text
-現有:  activeFilters.every(filter => coupon.items.some(item => matchesFilter(item, filter)))
-新增:  Object.entries(activeFilters).every(([filter, minCount]) =>
-         sum(coupon.items matching filter's count) >= minCount
-       )
+定義 FAQ 型別與資料陣列：
+- FaqItem: { id, question, answer, category }
+- FaqCategory: 'basic' | 'search' | 'favorite' | 'other'
+- FAQ_ITEMS: FaqItem[]
 ```
 
-#### 2. 修改 `SearchPanel.tsx` — UI 元件
+#### 2. 新增 `src/components/FaqDialog.tsx` — FAQ 對話框元件
 
-- 啟用的篩選按鈕增加 +/- 控制與數量顯示
-- 未啟用的按鈕維持現有外觀
-- 點擊按鈕本身切換啟用/停用（數量預設 1）
-- +/- 按鈕使用 `e.stopPropagation()` 避免觸發切換
+- 使用 Dialog + ScrollArea + Accordion 組合
+- 按類別分組顯示問題
+- 支援兩種觸發方式：圖示按鈕（桌面版）與選單項目（手機版）
+- 接受 `variant` prop 控制觸發方式（類似 AnnouncementButton 的設計模式）
 
-#### 3. 修改 `ItemFilter.tsx` — 型別匯出
+#### 3. 修改 `src/components/Header.tsx` — 加入 FAQ 入口
 
-- 保持 `ItemFilterId` 不變
-- 如需要，新增篩選數量相關的型別定義
-
-#### 4. 修改 `Index.tsx` — 傳遞更新後的 props
-
-- `activeFilters` 型別從陣列變為 Record，相關 props 同步更新
-
-#### 5. 更新單元測試 `useCouponFilters.test.ts`
-
-新增測試案例：
-- 篩選「蛋撻 >= 2」只返回含有 2 個以上蛋撻的優惠券
-- 數量減至 0 時自動移除篩選
-- 多個品項數量篩選取交集
-- `handleClearFilters` 清除所有數量篩選
+- 桌面版導航列中加入 FaqDialog（圖示按鈕形式）
+- 手機版 Sheet 選單中加入 FaqDialog（選單項目形式）
 
 ### 影響範圍
 
 | 檔案 | 變更 |
 |---|---|
-| `src/hooks/useCouponFilters.ts` | 狀態型別、篩選邏輯、新增數量方法 |
-| `src/components/SearchPanel.tsx` | 按鈕 UI 加入 +/- 控制 |
-| `src/components/ItemFilter.tsx` | 可能新增型別 |
-| `src/pages/Index.tsx` | props 型別同步 |
-| `src/test/hooks/useCouponFilters.test.ts` | 新增數量篩選測試 |
+| `src/data/faq.ts` | 新增 — FAQ 資料定義 |
+| `src/components/FaqDialog.tsx` | 新增 — FAQ 對話框元件 |
+| `src/components/Header.tsx` | 修改 — 加入 FAQ 按鈕 |
+
