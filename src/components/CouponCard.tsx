@@ -29,34 +29,21 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
   const isFavorite = favorites.has(coupon.coupon_code);
   const isHighlighted = highlightedCode === coupon.coupon_code;
 
-  const handleShare = async () => {
+  const handleShare = () => {
     const shareUrl = `${window.location.origin}${window.location.pathname}?coupon=${coupon.coupon_code}`;
-    const shareData = {
-      title: coupon.name,
-      text: `${coupon.name} - $${coupon.price}${coupon.original_price > 0 ? `（原價 $${coupon.original_price}）` : ''}`,
-      url: shareUrl,
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-      } catch (err) {
-        // User cancelled share
-      }
-    } else {
-      try {
-        const textarea = document.createElement("textarea");
-        textarea.value = shareUrl;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-        toast.success("已複製連結");
-      } catch {
-        toast.error("複製連結失敗");
-      }
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = shareUrl;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      toast.success("已複製連結");
+    } catch {
+      toast.error("複製連結失敗");
     }
   };
 
