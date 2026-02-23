@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import SearchPanel from "@/components/SearchPanel";
@@ -22,6 +23,8 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [highlightedCode, setHighlightedCode] = useState<number | null>(null);
   const { coupons, count: couponCount, lastUpdate, isLoading, error } = useCoupons();
   const { startTour, shouldShowTour } = useTour();
   const {
@@ -67,6 +70,28 @@ const Index = () => {
       cleanupInvalidFavorites(validCodes);
     }
   }, [coupons, cleanupInvalidFavorites]);
+
+  // Handle shared coupon link
+  useEffect(() => {
+    const couponParam = searchParams.get("coupon");
+    if (couponParam && coupons.length > 0) {
+      const code = Number(couponParam);
+      setHighlightedCode(code);
+      // Scroll to the coupon card
+      setTimeout(() => {
+        const el = document.querySelector(`[data-coupon-code="${code}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }, 300);
+      // Clear highlight and query param after animation
+      const timer = setTimeout(() => {
+        setHighlightedCode(null);
+        setSearchParams({}, { replace: true });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [coupons, searchParams, setSearchParams]);
 
   // Auto-start tour for first-time visitors
   useEffect(() => {
@@ -139,6 +164,7 @@ const Index = () => {
             onToggleFavorite={toggleFavorite}
             compareList={compareList}
             onToggleCompare={toggleCompare}
+            highlightedCode={highlightedCode}
           />
         </section>
       </main>

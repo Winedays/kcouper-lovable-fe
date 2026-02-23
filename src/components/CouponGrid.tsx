@@ -10,12 +10,13 @@ type CouponGridProps = {
   onToggleFavorite: (id: number) => void;
   compareList?: Set<number>;
   onToggleCompare?: (code: number) => void;
+  highlightedCode?: number | null;
 };
 
 const INITIAL_COUNT = 30;
 const BATCH_SIZE = 30;
 
-const CouponGrid = ({ coupons, favorites, onToggleFavorite, compareList, onToggleCompare }: CouponGridProps) => {
+const CouponGrid = ({ coupons, favorites, onToggleFavorite, compareList, onToggleCompare, highlightedCode }: CouponGridProps) => {
   const { visibleCount, hasMore, sentinelRef } = useProgressiveLoad(
     coupons.length,
     INITIAL_COUNT,
@@ -51,6 +52,7 @@ const CouponGrid = ({ coupons, favorites, onToggleFavorite, compareList, onToggl
             isFirstCard={index === 0}
             isComparing={compareList?.has(coupon.coupon_code)}
             onToggleCompare={onToggleCompare}
+            highlightedCode={highlightedCode}
           />
         ))}
         
