@@ -67,7 +67,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
         </div>
 
         {/* Desktop nav */}
-        <nav className="hidden sm:flex items-center gap-2">
+        <nav className="hidden lg:flex items-center gap-2">
           {lastUpdate && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
@@ -97,7 +97,7 @@ const Header = ({ lastUpdate }: HeaderProps) => {
         </nav>
 
         {/* Mobile nav */}
-        <div className="flex sm:hidden items-center gap-2">
+        <div className="flex lg:hidden items-center gap-2">
           {lastUpdate && (
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
