@@ -1,58 +1,59 @@
 
 
-# 新增價格區間篩選器
+# 新增分享優惠券功能
 
 ## 功能說明
-在搜尋面板中新增價格區間篩選功能，提供快捷按鈕（如「$100 以下」「$100-200」等）以及 Slider 精確調整，讓使用者快速找到符合預算的優惠券。
+在每張優惠券卡片上新增「分享」按鈕，使用者可透過 Web Share API（手機）或複製連結（桌面）將特定優惠券分享給朋友。分享連結帶有 `?coupon=<coupon_code>` 參數，開啟後自動捲動並高亮該優惠券。
 
 ## 使用流程
 
-1. 在篩選列（餐點篩選按鈕旁）看到價格區間快捷按鈕
-2. 點擊快捷按鈕可快速篩選常見價格範圍
-3. 展開 Popover 可使用雙向 Slider 精確調整最低/最高價格
-4. 價格篩選與現有篩選（搜尋、餐點、收藏）同時生效
-5. 清除按鈕可一併重置價格篩選
+1. 使用者在卡片上點擊「分享」按鈕
+2. 支援 Web Share API 的裝置 → 開啟系統分享面板
+3. 不支援的裝置 → 自動複製連結到剪貼簿，顯示 toast 提示「已複製連結」
+4. 收到連結的朋友開啟頁面 → 自動捲動到該優惠券並以動畫高亮顯示
 
 ## 技術細節
 
 ### 修改檔案
 
-**`src/hooks/useCouponFilters.ts`**
-- 新增 `priceRange` 狀態：`[min, max]` 陣列，預設 `null`（表示不篩選）
-- 新增 `setPriceRange(range: [number, number] | null)` setter
-- 在 `filteredAndSortedCoupons` 的 filter 邏輯中加入價格區間判斷：`coupon.price >= min && coupon.price <= max`
-- 在 `handleClearFilters` 中同時重置 `priceRange` 為 `null`
-- 在 `hasActiveFilters` 判斷中納入 `priceRange !== null`
-- 新增 `priceStats` (useMemo)：從所有優惠券計算最低價與最高價，供 Slider 使用
-- 回傳 `priceRange`、`setPriceRange`、`priceStats`
+**`src/components/CouponCard.tsx`**
+- 引入 `Share2` icon（來自 lucide-react）
+- 在「查看餐點選項」和「比較」按鈕同一列，新增「分享」按鈕
+- 新增 `handleShare` 函式：
+  - 組合分享 URL：`window.location.origin + window.location.pathname + ?coupon=<coupon_code>`
+  - 若 `navigator.share` 可用 → 呼叫 Web Share API，傳入 `title`（優惠券名稱）、`text`（價格資訊）、`url`
+  - 否則 → 使用 `navigator.clipboard.writeText(url)` 複製連結，並用 `toast.success("已複製連結")` 提示
+- 新增 `highlightedCode` prop（可選），若 `coupon.coupon_code === highlightedCode`，卡片加上高亮動畫 CSS class
+- 更新 memo 比較函式，加入 `highlightedCode` 比較
 
-**`src/components/SearchPanel.tsx`**
-- 新增 props：`priceRange`、`onPriceRangeChange`、`priceStats: { min: number; max: number }`
-- 在篩選列（餐點篩選按鈕之後）加入分隔線和價格篩選區塊：
-  - 快捷按鈕：「$100以下」「$100-200」「$200以上」，使用與餐點篩選相同的 pill 樣式
-  - 一個「自訂」按鈕，點擊展開 Popover，內含雙向 Slider（使用現有 `@radix-ui/react-slider`）和顯示目前選取的價格範圍文字
-- 當價格篩選啟用時，`hasActiveFilters` 要包含此條件，使清除按鈕可見
-- 引入 `DollarSign` icon 作為價格區塊前的圖示
+**`src/components/CouponGrid.tsx`**
+- 新增 `highlightedCode` prop，傳遞給每張 `CouponCard`
 
 **`src/pages/Index.tsx`**
-- 將 `priceRange`、`setPriceRange`、`priceStats` 從 `useCouponFilters` 解構並傳遞給 `SearchPanel`
+- 讀取 URL 的 `?coupon=` query param（使用 `useSearchParams` from react-router-dom）
+- 將 `highlightedCode` 傳遞給 `CouponGrid`
+- 新增 `useEffect`：當 coupons 載入且 `highlightedCode` 存在時，找到對應卡片 DOM 元素並 `scrollIntoView({ behavior: 'smooth', block: 'center' })`
+- 高亮動畫結束後（約 3 秒），清除 query param（使用 `setSearchParams`）
 
-**`src/test/components/SearchPanel.test.tsx`**
-- 在 `defaultProps` 中加入 `priceRange: null`、`onPriceRangeChange: vi.fn()`、`priceStats: { min: 0, max: 500 }`
-- 新增測試案例：
-  - 應該渲染價格快捷按鈕
-  - 點擊快捷按鈕應呼叫 `onPriceRangeChange`
-  - 價格篩選啟用時應顯示清除按鈕
+**`src/index.css`**
+- 新增 `@keyframes highlight-pulse` 動畫：邊框閃爍 2-3 次後消失
+- 新增 `.coupon-highlighted` class，套用該動畫和醒目邊框顏色
 
 ### UI 佈局
 
-篩選列結構（在現有餐點篩選按鈕之後）：
+卡片按鈕區域調整為三個按鈕：
 
 ```text
-[收藏] | [炸雞] [蛋撻] [...餐點篩選] | [$100以下] [$100-200] [$200以上] [自訂▾] | [清除]
+[查看餐點選項] [加入比較] [分享]
 ```
 
-- 快捷按鈕使用相同的圓角 pill 樣式，保持視覺一致
-- 「自訂」按鈕點開 Popover，內含 Slider 和價格顯示
-- 手機版全部在同一列水平捲動
+- 分享按鈕使用 `variant="outline"` 和 `Share2` icon
+- 手機版按鈕自動換行（現有的 `flex-col sm:flex-row` 佈局）
+
+### 高亮效果
+
+當透過分享連結開啟時，目標優惠券卡片會：
+1. 自動捲動至畫面中央
+2. 邊框以 primary 色閃爍 3 次（約 2 秒）
+3. 動畫結束後恢復正常樣式，同時清除 URL 的 query param
 
