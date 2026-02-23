@@ -1,58 +1,55 @@
 
 
-# 最新消息功能
+# 新增優惠券比較功能
 
-## 概述
-在 Header 新增一個「最新消息」按鈕（Bell icon + 未讀數字徽章），點擊後展開消息列表。使用 localStorage 記錄使用者最後閱讀的消息 ID，只對未讀消息顯示提醒。
+## 功能說明
+讓使用者可以勾選多張優惠券，在側邊面板或彈窗中並排比較價格、折扣、品項等資訊，方便做出選擇。
 
-## 功能設計
+## 使用流程
 
-### 資料結構
-在 `src/data/announcements.ts` 中定義消息資料：
-- 每則消息包含 `id`（遞增數字）、`title`、`content`、`date`
-- 開發者直接在此檔案新增消息即可
-
-### Hook: `useAnnouncements`
-- 從 localStorage 讀取 `lastReadAnnouncementId`
-- 計算未讀數量（id 大於 lastReadAnnouncementId 的消息數）
-- 提供 `markAllAsRead()` 將 lastReadAnnouncementId 更新為最新消息 ID
-
-### UI 元件: `AnnouncementButton`
-- 使用 `Bell` icon（lucide-react）
-- 未讀時在 icon 右上角顯示紅色數字徽章（Badge）
-- 點擊後開啟 Popover 顯示消息列表
-- 開啟時自動標記為已讀
-- 支援 `variant` prop（`"default"` 和 `"menu-item"`），與 Header 現有風格一致
-
-### Header 整合
-- 桌面版：在導覽列其他 icon 旁加入 AnnouncementButton
-- 手機版：在漢堡選單中加入 menu-item 風格的 AnnouncementButton
-
----
+1. 使用者在優惠券卡片上點擊「比較」按鈕，將優惠券加入比較清單
+2. 畫面底部出現浮動工具列，顯示已選數量（最多 4 張）
+3. 點擊「開始比較」後，開啟 Dialog/Sheet 顯示並排比較表格
+4. 比較表格包含：名稱、價格、原價、折扣、品項列表、有效期限、點餐連結
 
 ## 技術細節
 
 ### 新增檔案
 
-1. **`src/data/announcements.ts`** — 消息資料定義
-```ts
-type Announcement = {
-  id: number;
-  title: string;
-  content: string;
-  date: string;
-};
+**`src/hooks/useCompare.ts`** - 比較功能狀態管理 Hook
+- `compareList: Set<number>` 儲存選中的 coupon_code
+- `toggleCompare(code)` 新增/移除比較項目
+- `clearCompare()` 清空比較清單
+- `isComparing(code)` 檢查是否在比較清單中
+- 限制最多 4 張，超過時顯示 toast 提示
 
-const ANNOUNCEMENTS: Announcement[] = [
-  { id: 1, title: "歡迎使用 KCouper v2", content: "全新改版...", date: "2026-02-15" },
-];
-```
+**`src/components/CompareBar.tsx`** - 底部浮動比較工具列
+- 固定在畫面底部，僅在有選中項目時顯示
+- 顯示已選數量和「開始比較」按鈕
+- 可逐一移除或清空全部
 
-2. **`src/hooks/useAnnouncements.ts`** — localStorage 已讀狀態管理
-
-3. **`src/components/AnnouncementButton.tsx`** — Bell icon + Badge + Popover 元件
+**`src/components/CompareDialog.tsx`** - 比較彈窗
+- 使用 Sheet（從底部滑出）或 Dialog 呈現
+- 表格式並排顯示各優惠券的：
+  - 名稱
+  - 優惠價 / 原價 / 折扣
+  - 包含品項（含數量）
+  - 有效日期
+  - 前往點餐連結
+- 手機版可水平捲動
 
 ### 修改檔案
 
-4. **`src/components/Header.tsx`** — 桌面版和手機版選單中加入 AnnouncementButton
+**`src/components/CouponCard.tsx`**
+- 新增 `onToggleCompare` 和 `isComparing` props
+- 在按鈕區域新增「加入比較」按鈕（使用 `GitCompareArrows` icon）
+- 選中時按鈕樣式變更為高亮狀態
+
+**`src/components/CouponGrid.tsx`**
+- 傳遞比較相關 props 給 CouponCard
+
+**`src/pages/Index.tsx`**
+- 引入 `useCompare` hook
+- 將比較狀態傳入 CouponGrid
+- 加入 CompareBar 和 CompareDialog 元件
 
