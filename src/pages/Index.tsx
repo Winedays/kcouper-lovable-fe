@@ -71,27 +71,15 @@ const Index = () => {
     }
   }, [coupons, cleanupInvalidFavorites]);
 
-  // Handle shared coupon link
+  // Handle shared coupon link — filter to show only that coupon
   useEffect(() => {
     const couponParam = searchParams.get("coupon");
     if (couponParam && coupons.length > 0) {
       const code = Number(couponParam);
       setHighlightedCode(code);
-      // Scroll to the coupon card
-      setTimeout(() => {
-        const el = document.querySelector(`[data-coupon-code="${code}"]`);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }, 300);
-      // Clear highlight and query param after animation
-      const timer = setTimeout(() => {
-        setHighlightedCode(null);
-        setSearchParams({}, { replace: true });
-      }, 3000);
-      return () => clearTimeout(timer);
+      setSearchQuery(code.toString());
     }
-  }, [coupons, searchParams, setSearchParams]);
+  }, [coupons, searchParams, setSearchQuery]);
 
   // Auto-start tour for first-time visitors
   useEffect(() => {
