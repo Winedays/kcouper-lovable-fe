@@ -37,7 +37,6 @@ const CouponGrid = ({ coupons, favorites, onToggleFavorite, compareList, onToggl
 
   const visibleCoupons = coupons.slice(0, visibleCount);
   const remainingCount = coupons.length - visibleCount;
-  const skeletonCount = Math.min(remainingCount, 6); // Show max 6 skeletons
 
   return (
     <>
@@ -56,16 +55,16 @@ const CouponGrid = ({ coupons, favorites, onToggleFavorite, compareList, onToggl
           />
         ))}
         
+        {/* Sentinel element placed before skeletons so it's reachable */}
+        {hasMore && (
+          <div ref={sentinelRef} className="col-span-full h-4 w-full" aria-hidden="true" />
+        )}
+
         {/* Skeleton placeholders for loading state */}
-        {hasMore && Array.from({ length: skeletonCount }).map((_, i) => (
+        {hasMore && Array.from({ length: Math.min(remainingCount, 3) }).map((_, i) => (
           <CouponCardSkeleton key={`skeleton-${i}`} />
         ))}
       </div>
-      
-      {/* Sentinel element for IntersectionObserver */}
-      {hasMore && (
-        <div ref={sentinelRef} className="h-4 w-full" aria-hidden="true" />
-      )}
     </>
   );
 };
