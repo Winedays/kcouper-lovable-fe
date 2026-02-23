@@ -175,7 +175,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             <Button
               variant="hero"
               size="sm"
-              className="w-full py-3 sm:py-0"
+              className="py-2 sm:py-0"
               asChild
             >
               <a
