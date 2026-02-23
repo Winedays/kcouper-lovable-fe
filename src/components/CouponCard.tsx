@@ -140,7 +140,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             <Button
               variant="outline"
               size="sm"
-              className="py-2 sm:py-0"
+              className="flex-1 min-w-fit py-2 sm:py-0"
               onClick={() => setIsDialogOpen(true)}
             >
               <ChefHat className="h-4 w-4 mr-2" />
@@ -152,7 +152,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
               <Button
                 variant={isComparing ? "default" : "outline"}
                 size="sm"
-                className="py-2 sm:py-0"
+                className="flex-1 min-w-fit py-2 sm:py-0"
                 onClick={() => onToggleCompare(coupon.coupon_code)}
               >
                 <GitCompareArrows className="h-4 w-4 mr-2" />
@@ -175,7 +175,7 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             <Button
               variant="hero"
               size="sm"
-              className="py-2 sm:py-0"
+              className="flex-1 min-w-fit py-2 sm:py-0"
               asChild
             >
               <a
