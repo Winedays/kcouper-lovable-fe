@@ -79,7 +79,7 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
         coupon.name.toLowerCase().includes(searchLower) ||
         coupon.items.some((item) => item.name.toLowerCase().includes(searchLower)) ||
         coupon.coupon_code.toString().includes(searchLower) ||
-        coupon.product_code.toLowerCase().includes(searchLower) ||
+        
         (searchAllOptions && coupon.items.some((item) =>
           item.flavors?.some((flavor) => flavor.name.toLowerCase().includes(searchLower))
         ));
