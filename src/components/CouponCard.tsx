@@ -163,12 +163,12 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             {/* Share button */}
             <Button
               variant="outline"
-              size="sm"
-              className="flex-1 py-2 sm:py-0"
+              size="icon"
+              className="h-9 w-9 shrink-0"
               onClick={handleShare}
+              aria-label="分享"
             >
-              <Share2 className="h-4 w-4 mr-2" />
-              分享
+              <Share2 className="h-4 w-4" />
             </Button>
           </div>
 
