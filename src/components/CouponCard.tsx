@@ -170,25 +170,25 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
             >
               <Share2 className="h-4 w-4" />
             </Button>
-          </div>
 
-          {/* Order button */}
-          <Button
-            variant="hero"
-            size="sm"
-            className="mt-2 w-full py-3 sm:py-0"
-            asChild
-          >
-            <a
-              href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2"
+            {/* Order button */}
+            <Button
+              variant="hero"
+              size="sm"
+              className="w-full py-3 sm:py-0"
+              asChild
             >
-              <span>前往點餐</span>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
+              <a
+                href={`https://www.kfcclub.com.tw/meal/${coupon.product_code}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2"
+              >
+                <span>前往點餐</span>
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
         </div>
       </Card>
 
