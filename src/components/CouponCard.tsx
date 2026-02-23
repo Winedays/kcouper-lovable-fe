@@ -1,7 +1,7 @@
 import { type Coupon } from "@/data/coupons";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart, GitCompareArrows } from "lucide-react";
+import { Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart, GitCompareArrows, Share2 } from "lucide-react";
 import { useState, memo } from "react";
 import { toast } from "sonner";
 import {
@@ -20,12 +20,37 @@ type CouponCardProps = {
   isFirstCard?: boolean;
   isComparing?: boolean;
   onToggleCompare?: (code: number) => void;
+  highlightedCode?: number | null;
 };
 
-const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = false, isComparing = false, onToggleCompare }: CouponCardProps) => {
+const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = false, isComparing = false, onToggleCompare, highlightedCode }: CouponCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const isFavorite = favorites.has(coupon.coupon_code);
+  const isHighlighted = highlightedCode === coupon.coupon_code;
+
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}${window.location.pathname}?coupon=${coupon.coupon_code}`;
+    const shareData = {
+      title: coupon.name,
+      text: `${coupon.name} - $${coupon.price}${coupon.original_price > 0 ? `（原價 $${coupon.original_price}）` : ''}`,
+      url: shareUrl,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        // User cancelled share
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("已複製連結");
+      } catch {
+        toast.error("複製連結失敗");
+      }
+    }
+  };
 
   const handleToggleFavorite = () => {
     onToggleFavorite(coupon.coupon_code);
@@ -48,7 +73,8 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
     <>
       <Card
         data-tour={isFirstCard ? "coupon-card" : undefined}
-        className="group relative flex h-full flex-col overflow-hidden border-border/60 bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1"
+        data-coupon-code={coupon.coupon_code}
+        className={`group relative flex h-full flex-col overflow-hidden border-border/60 bg-card shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 ${isHighlighted ? 'coupon-highlighted' : ''}`}
         style={{
           animationDelay: index < 20 ? `${index * 50}ms` : '0ms',
         }}
@@ -133,6 +159,17 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
                 {isComparing ? "已加入比較" : "加入比較"}
               </Button>
             )}
+
+            {/* Share button */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 py-2 sm:py-0"
+              onClick={handleShare}
+            >
+              <Share2 className="h-4 w-4 mr-2" />
+              分享
+            </Button>
           </div>
 
           {/* Order button */}
@@ -257,6 +294,7 @@ export default memo(CouponCard, (prev, next) => {
     prev.favorites.has(prev.coupon.coupon_code) === next.favorites.has(next.coupon.coupon_code) &&
     prev.onToggleFavorite === next.onToggleFavorite &&
     prev.isComparing === next.isComparing &&
-    prev.onToggleCompare === next.onToggleCompare
+    prev.onToggleCompare === next.onToggleCompare &&
+    prev.highlightedCode === next.highlightedCode
   );
 });
