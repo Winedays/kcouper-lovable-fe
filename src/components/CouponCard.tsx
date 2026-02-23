@@ -1,7 +1,7 @@
 import { type Coupon } from "@/data/coupons";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart } from "lucide-react";
+import { Calendar, ExternalLink, ChefHat, ArrowRightLeft, Heart, GitCompareArrows } from "lucide-react";
 import { useState, memo } from "react";
 import { toast } from "sonner";
 import {
@@ -18,9 +18,11 @@ type CouponCardProps = {
   favorites: Set<number>;
   onToggleFavorite: (id: number) => void;
   isFirstCard?: boolean;
+  isComparing?: boolean;
+  onToggleCompare?: (code: number) => void;
 };
 
-const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = false }: CouponCardProps) => {
+const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = false, isComparing = false, onToggleCompare }: CouponCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const isFavorite = favorites.has(coupon.coupon_code);
@@ -136,6 +138,19 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
               </a>
             </Button>
           </div>
+
+          {/* Compare button */}
+          {onToggleCompare && (
+            <Button
+              variant={isComparing ? "default" : "outline"}
+              size="sm"
+              className="mt-2 w-full py-3 sm:py-0"
+              onClick={() => onToggleCompare(coupon.coupon_code)}
+            >
+              <GitCompareArrows className="h-4 w-4 mr-2" />
+              {isComparing ? "已加入比較" : "加入比較"}
+            </Button>
+          )}
         </div>
       </Card>
 
@@ -239,6 +254,8 @@ export default memo(CouponCard, (prev, next) => {
     prev.index === next.index &&
     prev.isFirstCard === next.isFirstCard &&
     prev.favorites.has(prev.coupon.coupon_code) === next.favorites.has(next.coupon.coupon_code) &&
-    prev.onToggleFavorite === next.onToggleFavorite
+    prev.onToggleFavorite === next.onToggleFavorite &&
+    prev.isComparing === next.isComparing &&
+    prev.onToggleCompare === next.onToggleCompare
   );
 });
