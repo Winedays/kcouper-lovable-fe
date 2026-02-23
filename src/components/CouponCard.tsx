@@ -44,24 +44,18 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
       }
     } else {
       try {
-        await navigator.clipboard.writeText(shareUrl);
+        const textarea = document.createElement("textarea");
+        textarea.value = shareUrl;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
         toast.success("已複製連結");
       } catch {
-        // Fallback for browsers that don't support clipboard API
-        try {
-          const textarea = document.createElement("textarea");
-          textarea.value = shareUrl;
-          textarea.style.position = "fixed";
-          textarea.style.opacity = "0";
-          document.body.appendChild(textarea);
-          textarea.focus();
-          textarea.select();
-          document.execCommand("copy");
-          document.body.removeChild(textarea);
-          toast.success("已複製連結");
-        } catch {
-          toast.error("複製連結失敗");
-        }
+        toast.error("複製連結失敗");
       }
     }
   };
