@@ -42,6 +42,9 @@ const Index = () => {
     setSortBy,
     searchAllOptions,
     setSearchAllOptions,
+    priceRange,
+    setPriceRange,
+    priceStats,
     handleFilterToggle,
     handleClearFilters,
     handleToggleFavorites,
@@ -124,6 +127,9 @@ const Index = () => {
           sortBy={sortBy}
           onSortChange={setSortBy}
           resultCount={filteredAndSortedCoupons.length}
+          priceRange={priceRange}
+          onPriceRangeChange={setPriceRange}
+          priceStats={priceStats}
         />
 
         <section className="container py-6">

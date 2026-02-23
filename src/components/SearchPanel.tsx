@@ -1,7 +1,9 @@
-import { Search, X, Heart, SlidersHorizontal, Info } from "lucide-react";
+import { useState } from "react";
+import { Search, X, Heart, SlidersHorizontal, Info, DollarSign, ChevronDown } from "lucide-react";
 import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
+import { Slider } from "./ui/slider";
 import { cn } from "@/lib/utils";
 import { itemFilters, type ItemFilterId } from "./ItemFilter";
 import SortSelect, { type SortOption } from "./SortSelect";
@@ -10,6 +12,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "./ui/popover";
+
+/** Price range quick-select presets */
+const PRICE_PRESETS: { label: string; range: [number, number] }[] = [
+  { label: "$100以下", range: [0, 100] },
+  { label: "$100-200", range: [100, 200] },
+  { label: "$200以上", range: [200, 9999] },
+];
 
 type SearchPanelProps = {
   searchQuery: string;
@@ -25,6 +34,23 @@ type SearchPanelProps = {
   sortBy: SortOption;
   onSortChange: (value: SortOption) => void;
   resultCount: number;
+  priceRange: [number, number] | null;
+  onPriceRangeChange: (range: [number, number] | null) => void;
+  priceStats: { min: number; max: number };
+};
+
+/**
+ * Check if a price range matches a preset exactly
+ */
+const isPresetActive = (
+  priceRange: [number, number] | null,
+  preset: [number, number],
+  maxPrice: number
+): boolean => {
+  if (!priceRange) return false;
+  const effectivePresetMax = preset[1] === 9999 ? maxPrice : preset[1];
+  const effectiveRangeMax = priceRange[1] === 9999 ? maxPrice : priceRange[1];
+  return priceRange[0] === preset[0] && effectiveRangeMax === effectivePresetMax;
 };
 
 const SearchPanel = ({
@@ -41,8 +67,38 @@ const SearchPanel = ({
   sortBy,
   onSortChange,
   resultCount,
+  priceRange,
+  onPriceRangeChange,
+  priceStats,
 }: SearchPanelProps) => {
-  const hasActiveFilters = activeFilters.length > 0 || showFavoritesOnly;
+  const hasActiveFilters = activeFilters.length > 0 || showFavoritesOnly || priceRange !== null;
+
+  /** Local slider state for the custom popover */
+  const [sliderValue, setSliderValue] = useState<[number, number]>([priceStats.min, priceStats.max]);
+
+  const handlePresetClick = (preset: [number, number]) => {
+    const effectiveMax = preset[1] === 9999 ? priceStats.max : preset[1];
+    if (isPresetActive(priceRange, preset, priceStats.max)) {
+      onPriceRangeChange(null);
+    } else {
+      onPriceRangeChange([preset[0], effectiveMax]);
+    }
+  };
+
+  const handleSliderCommit = (value: number[]) => {
+    const [min, max] = value as [number, number];
+    if (min === priceStats.min && max === priceStats.max) {
+      onPriceRangeChange(null);
+    } else {
+      onPriceRangeChange([min, max]);
+    }
+  };
+
+  const handlePopoverOpen = (open: boolean) => {
+    if (open) {
+      setSliderValue(priceRange ?? [priceStats.min, priceStats.max]);
+    }
+  };
 
   return (
     <div className="border-b border-border/50 bg-background">
@@ -160,6 +216,75 @@ const SearchPanel = ({
                 </button>
               );
             })}
+            </div>
+
+            {/* Divider */}
+            <div className="h-5 w-px bg-border shrink-0" />
+
+            {/* Price range filters */}
+            <div data-tour="price-filter" className="flex shrink-0 items-center gap-2">
+              <DollarSign className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+              {PRICE_PRESETS.map((preset) => {
+                const active = isPresetActive(priceRange, preset.range, priceStats.max);
+                return (
+                  <button
+                    key={preset.label}
+                    onClick={() => handlePresetClick(preset.range)}
+                    aria-pressed={active}
+                    className={cn(
+                      "inline-flex shrink-0 items-center rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
+                      active
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    )}
+                  >
+                    {preset.label}
+                  </button>
+                );
+              })}
+
+              {/* Custom price range popover */}
+              <Popover onOpenChange={handlePopoverOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
+                      priceRange && !PRICE_PRESETS.some((p) => isPresetActive(priceRange, p.range, priceStats.max))
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    )}
+                  >
+                    <span>自訂</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-72" side="bottom" align="start">
+                  <div className="space-y-4">
+                    <p className="text-sm font-medium">自訂價格範圍</p>
+                    <Slider
+                      min={priceStats.min}
+                      max={priceStats.max}
+                      step={10}
+                      value={sliderValue}
+                      onValueChange={(v) => setSliderValue(v as [number, number])}
+                      onValueCommit={handleSliderCommit}
+                      minStepsBetweenThumbs={1}
+                    />
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>${sliderValue[0]}</span>
+                      <span>${sliderValue[1]}</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        handleSliderCommit(sliderValue);
+                      }}
+                      className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                    >
+                      套用
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
