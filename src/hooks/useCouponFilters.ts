@@ -21,6 +21,14 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("price-asc");
   const [searchAllOptions, setSearchAllOptions] = useState(false);
+  const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
+
+  /** Min and max price across all coupons, for Slider bounds */
+  const priceStats = useMemo(() => {
+    if (coupons.length === 0) return { min: 0, max: 500 };
+    const prices = coupons.map((c) => c.price);
+    return { min: Math.min(...prices), max: Math.max(...prices) };
+  }, [coupons]);
 
   const handleFilterToggle = useCallback((filter: ItemFilterId) => {
     setActiveFilters((prev) =>
@@ -33,6 +41,7 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
   const handleClearFilters = useCallback(() => {
     setActiveFilters([]);
     setShowFavoritesOnly(false);
+    setPriceRange(null);
   }, []);
 
   const handleToggleFavorites = useCallback(() => {
@@ -44,6 +53,13 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
       // Favorites filter
       if (showFavoritesOnly && !favorites.has(coupon.coupon_code)) {
         return false;
+      }
+
+      // Price range filter
+      if (priceRange) {
+        if (coupon.price < priceRange[0] || coupon.price > priceRange[1]) {
+          return false;
+        }
       }
 
       // Item filters
@@ -93,7 +109,7 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
           return 0;
       }
     });
-  }, [coupons, searchQuery, activeFilters, showFavoritesOnly, favorites, sortBy, searchAllOptions]);
+  }, [coupons, searchQuery, activeFilters, showFavoritesOnly, favorites, sortBy, searchAllOptions, priceRange]);
 
   return {
     searchQuery,
@@ -104,6 +120,9 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
     setSortBy,
     searchAllOptions,
     setSearchAllOptions,
+    priceRange,
+    setPriceRange,
+    priceStats,
     handleFilterToggle,
     handleClearFilters,
     handleToggleFavorites,

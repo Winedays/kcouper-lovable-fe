@@ -20,6 +20,9 @@ describe("SearchPanel", () => {
     sortBy: "discount" as SortOption,
     onSortChange: vi.fn(),
     resultCount: 100,
+    priceRange: null as [number, number] | null,
+    onPriceRangeChange: vi.fn(),
+    priceStats: { min: 0, max: 500 },
   };
 
   beforeEach(() => {
@@ -167,9 +170,35 @@ describe("SearchPanel", () => {
   describe("排序選擇", () => {
     it("應該渲染排序選擇器", () => {
       const { container } = render(<SearchPanel {...defaultProps} />);
-      // SortSelect renders a select trigger
       const sortTrigger = container.querySelector('[role="combobox"]');
       expect(sortTrigger).toBeInTheDocument();
+    });
+  });
+
+  describe("價格區間篩選", () => {
+    it("應該渲染價格快捷按鈕", () => {
+      render(<SearchPanel {...defaultProps} />);
+      expect(screen.getByText("$100以下")).toBeInTheDocument();
+      expect(screen.getByText("$100-200")).toBeInTheDocument();
+      expect(screen.getByText("$200以上")).toBeInTheDocument();
+    });
+
+    it("點擊快捷按鈕應呼叫 onPriceRangeChange", () => {
+      const onPriceRangeChange = vi.fn();
+      render(<SearchPanel {...defaultProps} onPriceRangeChange={onPriceRangeChange} />);
+      
+      fireEvent.click(screen.getByText("$100以下"));
+      expect(onPriceRangeChange).toHaveBeenCalledWith([0, 100]);
+    });
+
+    it("價格篩選啟用時應顯示清除按鈕", () => {
+      render(<SearchPanel {...defaultProps} priceRange={[0, 100]} />);
+      expect(screen.getByText("清除")).toBeInTheDocument();
+    });
+
+    it("應該渲染自訂按鈕", () => {
+      render(<SearchPanel {...defaultProps} />);
+      expect(screen.getByText("自訂")).toBeInTheDocument();
     });
   });
 });
