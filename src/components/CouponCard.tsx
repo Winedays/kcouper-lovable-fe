@@ -136,42 +136,40 @@ const CouponCard = ({ coupon, index, favorites, onToggleFavorite, isFirstCard = 
           </div>
 
           {/* Action buttons */}
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <div className="mt-4 flex flex-wrap gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 py-2 sm:py-0"
+              className="py-2 sm:py-0"
               onClick={() => setIsDialogOpen(true)}
             >
               <ChefHat className="h-4 w-4 mr-2" />
               查看餐點選項
             </Button>
 
-            <div className="flex gap-2">
-              {/* Compare button */}
-              {onToggleCompare && (
-                <Button
-                  variant={isComparing ? "default" : "outline"}
-                  size="sm"
-                  className="flex-1 py-2 sm:py-0"
-                  onClick={() => onToggleCompare(coupon.coupon_code)}
-                >
-                  <GitCompareArrows className="h-4 w-4 mr-2" />
-                  {isComparing ? "已加入比較" : "加入比較"}
-                </Button>
-              )}
-
-              {/* Share button */}
+            {/* Compare button */}
+            {onToggleCompare && (
               <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 shrink-0"
-                onClick={handleShare}
-                aria-label="分享"
+                variant={isComparing ? "default" : "outline"}
+                size="sm"
+                className="py-2 sm:py-0"
+                onClick={() => onToggleCompare(coupon.coupon_code)}
               >
-                <Share2 className="h-4 w-4" />
+                <GitCompareArrows className="h-4 w-4 mr-2" />
+                {isComparing ? "已加入比較" : "加入比較"}
               </Button>
-            </div>
+            )}
+
+            {/* Share button */}
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-9 w-9 shrink-0"
+              onClick={handleShare}
+              aria-label="分享"
+            >
+              <Share2 className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Order button */}
