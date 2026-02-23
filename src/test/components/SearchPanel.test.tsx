@@ -4,6 +4,7 @@ import { screen, fireEvent } from "@testing-library/dom";
 import SearchPanel from "@/components/SearchPanel";
 import { itemFilters, type ItemFilterId } from "@/components/ItemFilter";
 import type { SortOption } from "@/components/SortSelect";
+import type { ActiveFiltersMap } from "@/hooks/useCouponFilters";
 
 describe("SearchPanel", () => {
   const defaultProps = {
@@ -11,8 +12,9 @@ describe("SearchPanel", () => {
     onSearchChange: vi.fn(),
     searchAllOptions: false,
     onSearchAllOptionsChange: vi.fn(),
-    activeFilters: [] as ItemFilterId[],
+    activeFilters: {} as ActiveFiltersMap,
     onFilterToggle: vi.fn(),
+    onFilterCountChange: vi.fn(),
     onClearAll: vi.fn(),
     showFavoritesOnly: false,
     onToggleFavorites: vi.fn(),
@@ -53,7 +55,6 @@ describe("SearchPanel", () => {
 
     it("有搜尋內容時應該顯示清除按鈕", () => {
       render(<SearchPanel {...defaultProps} searchQuery="測試" />);
-      // Find the clear button (X icon) in the search input area
       const clearButtons = screen.getAllByRole("button");
       const searchClearButton = clearButtons.find((btn) => 
         btn.querySelector('svg.lucide-x') && btn.closest('.relative')
@@ -131,7 +132,7 @@ describe("SearchPanel", () => {
 
   describe("清除篩選", () => {
     it("當有篩選時應該顯示清除按鈕", () => {
-      render(<SearchPanel {...defaultProps} activeFilters={["蛋撻"]} />);
+      render(<SearchPanel {...defaultProps} activeFilters={{ "蛋撻": 1 }} />);
       expect(screen.getByText("清除")).toBeInTheDocument();
     });
 
@@ -147,7 +148,7 @@ describe("SearchPanel", () => {
 
     it("點擊清除按鈕應該呼叫 onClearAll", () => {
       const onClearAll = vi.fn();
-      render(<SearchPanel {...defaultProps} activeFilters={["蛋撻"]} onClearAll={onClearAll} />);
+      render(<SearchPanel {...defaultProps} activeFilters={{ "蛋撻": 1 }} onClearAll={onClearAll} />);
       
       fireEvent.click(screen.getByText("清除"));
       expect(onClearAll).toHaveBeenCalledTimes(1);

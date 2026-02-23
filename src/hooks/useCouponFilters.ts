@@ -4,6 +4,12 @@ import { type ItemFilterId, filterMatchRules } from "@/components/ItemFilter";
 import { type SortOption } from "@/components/SortSelect";
 
 /**
+ * Active filters map: filter ID → minimum required count
+ * @typedef {Partial<Record<ItemFilterId, number>>} ActiveFiltersMap
+ */
+export type ActiveFiltersMap = Partial<Record<ItemFilterId, number>>;
+
+/**
  * Check if a name matches a filter using the filterMatchRules
  * @param name - The name to check
  * @param filter - The filter ID to match against
@@ -17,7 +23,7 @@ const checkNameMatchesFilter = (name: string, filter: ItemFilterId): boolean => 
 
 export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilters, setActiveFilters] = useState<ItemFilterId[]>([]);
+  const [activeFilters, setActiveFilters] = useState<ActiveFiltersMap>({});
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("price-asc");
   const [searchAllOptions, setSearchAllOptions] = useState(false);
@@ -30,16 +36,34 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
     return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [coupons]);
 
+  /** Toggle a filter on/off (sets count to 1 when enabling) */
   const handleFilterToggle = useCallback((filter: ItemFilterId) => {
-    setActiveFilters((prev) =>
-      prev.includes(filter)
-        ? prev.filter((f) => f !== filter)
-        : [...prev, filter]
-    );
+    setActiveFilters((prev) => {
+      if (filter in prev) {
+        const next = { ...prev };
+        delete next[filter];
+        return next;
+      }
+      return { ...prev, [filter]: 1 };
+    });
+  }, []);
+
+  /** Adjust count for an active filter by delta (+1 or -1). Removes if count reaches 0. */
+  const handleFilterCountChange = useCallback((filter: ItemFilterId, delta: number) => {
+    setActiveFilters((prev) => {
+      const current = prev[filter] ?? 0;
+      const next = current + delta;
+      if (next <= 0) {
+        const updated = { ...prev };
+        delete updated[filter];
+        return updated;
+      }
+      return { ...prev, [filter]: next };
+    });
   }, []);
 
   const handleClearFilters = useCallback(() => {
-    setActiveFilters([]);
+    setActiveFilters({});
     setShowFavoritesOnly(false);
     setPriceRange(null);
   }, []);
@@ -49,6 +73,8 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
   }, []);
 
   const filteredAndSortedCoupons = useMemo(() => {
+    const filterEntries = Object.entries(activeFilters) as [ItemFilterId, number][];
+
     const filtered = coupons.filter((coupon) => {
       // Favorites filter
       if (showFavoritesOnly && !favorites.has(coupon.coupon_code)) {
@@ -62,15 +88,20 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
         }
       }
 
-      // Item filters
+      // Item filters with quantity check
       const matchesFilter =
-        activeFilters.length === 0 ||
-        activeFilters.every((filter) =>
-          coupon.items.some((item) =>
-            checkNameMatchesFilter(item.name, filter) ||
-            (searchAllOptions && item.flavors?.some((flavor) => checkNameMatchesFilter(flavor.name, filter)))
-          )
-        );
+        filterEntries.length === 0 ||
+        filterEntries.every(([filter, minCount]) => {
+          // Sum up count of all matching items
+          const totalCount = coupon.items.reduce((sum, item) => {
+            const nameMatches = checkNameMatchesFilter(item.name, filter);
+            const flavorMatches = searchAllOptions && item.flavors?.some(
+              (flavor) => checkNameMatchesFilter(flavor.name, filter)
+            );
+            return sum + (nameMatches || flavorMatches ? item.count : 0);
+          }, 0);
+          return totalCount >= minCount;
+        });
 
       // Search filter
       const searchLower = searchQuery.toLowerCase();
@@ -124,6 +155,7 @@ export const useCouponFilters = (coupons: Coupon[], favorites: Set<number>) => {
     setPriceRange,
     priceStats,
     handleFilterToggle,
+    handleFilterCountChange,
     handleClearFilters,
     handleToggleFavorites,
     filteredAndSortedCoupons,

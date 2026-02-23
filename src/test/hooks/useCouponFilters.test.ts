@@ -145,6 +145,68 @@ describe("useCouponFilters", () => {
     });
   });
 
+  describe("數量篩選", () => {
+    it("篩選數量 >= 2 應只返回符合條件的優惠券", () => {
+      const { result } = setup();
+      // 啟用炸雞篩選（預設 count=1）
+      act(() => result.current.handleFilterToggle("炸雞"));
+      // 應匹配 coupon 30003（咔啦脆雞 count=2）
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(1);
+      expect(result.current.filteredAndSortedCoupons[0].coupon_code).toBe(30003);
+
+      // 增加到 count >= 2
+      act(() => result.current.handleFilterCountChange("炸雞", 1));
+      expect(result.current.activeFilters["炸雞"]).toBe(2);
+      // 仍匹配（coupon 30003 有 count=2）
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(1);
+
+      // 增加到 count >= 3，應無匹配
+      act(() => result.current.handleFilterCountChange("炸雞", 1));
+      expect(result.current.activeFilters["炸雞"]).toBe(3);
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(0);
+    });
+
+    it("數量減至 0 時應自動移除篩選", () => {
+      const { result } = setup();
+      act(() => result.current.handleFilterToggle("蛋撻"));
+      expect(result.current.activeFilters["蛋撻"]).toBe(1);
+
+      act(() => result.current.handleFilterCountChange("蛋撻", -1));
+      expect(result.current.activeFilters["蛋撻"]).toBeUndefined();
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(3);
+    });
+
+    it("雞塊數量篩選 >= 4 應匹配", () => {
+      const { result } = setup();
+      act(() => result.current.handleFilterToggle("雞塊"));
+      // 預設 count=1，應匹配 coupon 20002（上校雞塊 count=4）
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(1);
+      
+      // 增加到 count >= 4
+      act(() => result.current.handleFilterCountChange("雞塊", 3));
+      expect(result.current.activeFilters["雞塊"]).toBe(4);
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(1);
+
+      // 增加到 count >= 5，無匹配
+      act(() => result.current.handleFilterCountChange("雞塊", 1));
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(0);
+    });
+
+    it("handleClearFilters 應清除所有數量篩選", () => {
+      const { result } = setup();
+      act(() => {
+        result.current.handleFilterToggle("蛋撻");
+        result.current.handleFilterCountChange("蛋撻", 1);
+        result.current.handleFilterToggle("雞塊");
+      });
+      expect(Object.keys(result.current.activeFilters).length).toBe(2);
+
+      act(() => result.current.handleClearFilters());
+      expect(Object.keys(result.current.activeFilters).length).toBe(0);
+      expect(result.current.filteredAndSortedCoupons).toHaveLength(3);
+    });
+  });
+
   describe("收藏篩選", () => {
     it("只顯示收藏應過濾非收藏優惠券", () => {
       const favorites = new Set([10001]);
