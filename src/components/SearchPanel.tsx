@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Search, X, Heart, SlidersHorizontal, Info, DollarSign, ChevronDown } from "lucide-react";
+import { Search, X, Heart, SlidersHorizontal, Info, DollarSign, ChevronDown, Plus, Minus } from "lucide-react";
 import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 import { cn } from "@/lib/utils";
 import { itemFilters, type ItemFilterId } from "./ItemFilter";
+import { type ActiveFiltersMap } from "@/hooks/useCouponFilters";
 import SortSelect, { type SortOption } from "./SortSelect";
 import {
   Popover,
@@ -25,8 +26,9 @@ type SearchPanelProps = {
   onSearchChange: (query: string) => void;
   searchAllOptions: boolean;
   onSearchAllOptionsChange: (value: boolean) => void;
-  activeFilters: ItemFilterId[];
+  activeFilters: ActiveFiltersMap;
   onFilterToggle: (filter: ItemFilterId) => void;
+  onFilterCountChange: (filter: ItemFilterId, delta: number) => void;
   onClearAll: () => void;
   showFavoritesOnly: boolean;
   onToggleFavorites: () => void;
@@ -60,6 +62,7 @@ const SearchPanel = ({
   onSearchAllOptionsChange,
   activeFilters,
   onFilterToggle,
+  onFilterCountChange,
   onClearAll,
   showFavoritesOnly,
   onToggleFavorites,
@@ -71,7 +74,7 @@ const SearchPanel = ({
   onPriceRangeChange,
   priceStats,
 }: SearchPanelProps) => {
-  const hasActiveFilters = activeFilters.length > 0 || showFavoritesOnly || priceRange !== null;
+  const hasActiveFilters = Object.keys(activeFilters).length > 0 || showFavoritesOnly || priceRange !== null;
 
   /** Local slider state for the custom popover */
   const [sliderValue, setSliderValue] = useState<[number, number]>([priceStats.min, priceStats.max]);
@@ -195,25 +198,55 @@ const SearchPanel = ({
             {/* Divider */}
             <div className="h-5 w-px bg-border shrink-0" />
 
-            {/* Item filters */}
+            {/* Item filters with quantity controls */}
             <div data-tour="filters" className="flex items-center gap-2">
             {itemFilters.map((filter) => {
-              const isActive = activeFilters.includes(filter.id);
+              const count = activeFilters[filter.id];
+              const isActive = count !== undefined;
               return (
-                <button
-                  key={filter.id}
-                  onClick={() => onFilterToggle(filter.id)}
-                  aria-pressed={isActive}
-                  className={cn(
-                    "inline-flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                <div key={filter.id} className="flex shrink-0 items-center">
+                  <button
+                    onClick={() => onFilterToggle(filter.id)}
+                    aria-pressed={isActive}
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-1 text-xs font-medium transition-all duration-200",
+                      isActive
+                        ? "rounded-l-full bg-primary text-primary-foreground shadow-sm px-3 py-1.5"
+                        : "rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80 px-3 py-1.5"
+                    )}
+                  >
+                    <span>{filter.emoji}</span>
+                    <span>{filter.label}</span>
+                    {isActive && count > 1 && (
+                      <span className="text-[10px] font-bold opacity-80">x{count}</span>
+                    )}
+                  </button>
+                  {isActive && (
+                    <div className="inline-flex items-center rounded-r-full bg-primary/90 text-primary-foreground">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onFilterCountChange(filter.id, -1);
+                        }}
+                        className="flex h-[30px] w-6 items-center justify-center hover:bg-primary-foreground/10 transition-colors"
+                        aria-label={`減少${filter.label}數量`}
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                      <span className="min-w-[16px] text-center text-xs font-bold">{count}</span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onFilterCountChange(filter.id, 1);
+                        }}
+                        className="flex h-[30px] w-6 items-center justify-center rounded-r-full hover:bg-primary-foreground/10 transition-colors"
+                        aria-label={`增加${filter.label}數量`}
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </div>
                   )}
-                >
-                  <span>{filter.emoji}</span>
-                  <span>{filter.label}</span>
-                </button>
+                </div>
               );
             })}
             </div>

@@ -49,6 +49,7 @@ const Index = () => {
     setPriceRange,
     priceStats,
     handleFilterToggle,
+    handleFilterCountChange,
     handleClearFilters,
     handleToggleFavorites,
     filteredAndSortedCoupons,
@@ -133,6 +134,7 @@ const Index = () => {
           onSearchAllOptionsChange={setSearchAllOptions}
           activeFilters={activeFilters}
           onFilterToggle={handleFilterToggle}
+          onFilterCountChange={handleFilterCountChange}
           onClearAll={handleClearFilters}
           showFavoritesOnly={showFavoritesOnly}
           onToggleFavorites={handleToggleFavorites}
