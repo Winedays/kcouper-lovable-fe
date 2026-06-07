@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import {
   Accordion,
   AccordionContent,
@@ -54,7 +54,7 @@ const FaqDialog = ({ variant = "default" }: FaqDialogProps) => {
         <DialogHeader>
           <DialogTitle>常見問題</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="flex-1 -mx-6 px-6">
+        <div className="flex-1 overflow-y-auto overscroll-contain -mx-6 px-6">
           <div className="space-y-6 pb-4">
             {FAQ_CATEGORY_ORDER.map((category) => {
               const items = FAQ_ITEMS.filter((f) => f.category === category);
@@ -82,7 +82,7 @@ const FaqDialog = ({ variant = "default" }: FaqDialogProps) => {
               );
             })}
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
