@@ -309,14 +309,6 @@ const SearchPanel = ({
                       <span>${sliderValue[0]}</span>
                       <span>${sliderValue[1]}</span>
                     </div>
-                    <button
-                      onClick={() => {
-                        handleSliderCommit(sliderValue);
-                      }}
-                      className="w-full rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-                    >
-                      套用
-                    </button>
                   </div>
                 </PopoverContent>
               </Popover>
